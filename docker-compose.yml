@@ -12,10 +12,3 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-    networks:
-      - agentops-network
-
-networks:
-  agentops-network:
-    external: true
-    name: bridge
