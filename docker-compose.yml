@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  pyhgoshift-homepage:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pyhgoshift-web
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    networks:
+      - agentops-network
+
+networks:
+  agentops-network:
+    external: true
+    name: bridge
