@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.pyhgoshift.com"),
   title: "PYHGOSHIFT (파이고시프트) | Autonomous AgentOps Platform",
   description: "박용희 두뇌의 외부 확장 시스템이자 인간의 개입을 0으로 만드는 AgentOps 플랫폼. 자아 훼방(Ego Disruption) 철학으로 숨은 가치를 발굴하고 극대화합니다.",
   keywords: [
@@ -25,9 +26,17 @@ export const metadata: Metadata = {
     siteName: "PYHGOSHIFT",
     locale: "ko_KR",
     type: "website",
+    images: [
+      {
+        url: "/images/pyhgoshift_ci.png",
+        width: 1200,
+        height: 675,
+        alt: "PYHGOSHIFT Official CI",
+      },
+    ],
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: "/images/pyhgoshift_ci.png",
   },
 };
 

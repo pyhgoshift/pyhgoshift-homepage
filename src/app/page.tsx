@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   Brain,
   Shield,
@@ -75,8 +76,15 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
-                <Brain className="w-5 h-5 text-white" />
+              <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-cyan-500/40 shadow-lg shadow-cyan-500/20 bg-slate-950 flex items-center justify-center p-0.5 group">
+                <Image
+                  src="/images/pyhgoshift_ci.png"
+                  alt="PYHGOSHIFT Logo"
+                  width={40}
+                  height={40}
+                  className="object-contain w-full h-full group-hover:scale-110 transition-transform duration-300"
+                  priority
+                />
               </div>
               <div className="flex flex-col">
                 <span className="font-extrabold tracking-wider text-xl bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500">
@@ -142,9 +150,25 @@ export default function HomePage() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/30 text-xs text-cyan-300 mb-8 font-mono shadow-inner">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/30 text-xs text-cyan-300 mb-6 font-mono shadow-inner">
             <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-spin" />
             <span className="font-semibold tracking-wide">DIGITAL WORKFORCE & AUTONOMOUS AGENT PLATFORM</span>
+          </div>
+
+          {/* Official CI Emblem Display */}
+          <div className="relative mx-auto mb-8 w-48 sm:w-56 md:w-64 aspect-square flex items-center justify-center">
+            {/* Glowing Backdrop Ring */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-cyan-500/30 via-emerald-500/20 to-purple-600/30 blur-2xl animate-pulse pointer-events-none"></div>
+            <div className="relative w-full h-full p-3 rounded-3xl bg-slate-950/80 border border-cyan-500/30 shadow-2xl shadow-cyan-500/20 backdrop-blur-xl flex items-center justify-center hover:border-cyan-400/60 hover:scale-105 transition-all duration-500 group">
+              <Image
+                src="/images/pyhgoshift_ci.png"
+                alt="PYHGOSHIFT Official CI"
+                width={260}
+                height={260}
+                className="object-contain w-full h-full drop-shadow-[0_0_25px_rgba(6,182,212,0.5)] group-hover:drop-shadow-[0_0_35px_rgba(16,185,129,0.6)] transition-all duration-500"
+                priority
+              />
+            </div>
           </div>
 
           {/* Main Title */}
@@ -326,6 +350,43 @@ export default function HomePage() {
               <div className="mt-6 pt-4 border-t border-slate-800/80 text-xs text-slate-400 font-mono flex items-center justify-between">
                 <span>0클릭 수집: 텔레그램봇 · 노션 · 음성STT</span>
                 <span className="text-cyan-400">외부 순환 활성화</span>
+              </div>
+            </div>
+          </div>
+
+          {/* CI BRAND IDENTITY BANNER */}
+          <div className="mt-12 glass-panel p-8 rounded-3xl border border-cyan-500/30 bg-gradient-to-r from-slate-950 via-[#071326] to-slate-950 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+              <div className="md:col-span-1 flex justify-center">
+                <div className="relative w-48 h-48 rounded-2xl bg-slate-900/80 border border-cyan-500/40 p-4 shadow-xl shadow-cyan-500/20 flex items-center justify-center">
+                  <Image
+                    src="/images/pyhgoshift_ci.png"
+                    alt="PYHGOSHIFT CI Emblem"
+                    width={180}
+                    height={180}
+                    className="object-contain w-full h-full drop-shadow-[0_0_20px_rgba(6,182,212,0.4)]"
+                  />
+                </div>
+              </div>
+              <div className="md:col-span-2 space-y-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-xs text-cyan-300 font-mono">
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>OFFICIAL BRAND IDENTITY & SYMBOL</span>
+                </div>
+                <h3 className="text-2xl font-extrabold text-white">
+                  한반도의 지능형 에너지와 자아 훼방(Ego Disruption)의 나선
+                </h3>
+                <p className="text-slate-300 text-sm leading-relaxed">
+                  파이고시프트의 공식 CI는 <strong>대한민국 지도 형상</strong>을 기반으로 고정관념을 흔드는 
+                  유려한 네온 에너지 나선(Shift)과 결합되어 있습니다. 규정과 규칙의 테두리 안에서 자아를 훼방시켜 
+                  숨겨진 가치를 극대화하고, 인간의 개입을 0으로 만드는 자율 에이전트의 강인한 생명력을 상징합니다.
+                </p>
+                <div className="pt-2 flex flex-wrap gap-2 text-xs font-mono text-cyan-400">
+                  <span className="px-3 py-1 rounded-lg bg-slate-900/80 border border-slate-800">• PYH (박용희)</span>
+                  <span className="px-3 py-1 rounded-lg bg-slate-900/80 border border-slate-800">• EGO (자아)</span>
+                  <span className="px-3 py-1 rounded-lg bg-slate-900/80 border border-slate-800">• SHIFT (훼방과 도약)</span>
+                </div>
               </div>
             </div>
           </div>
@@ -793,9 +854,15 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-md bg-cyan-500 flex items-center justify-center">
-                  <Brain className="w-3.5 h-3.5 text-black" />
+              <div className="flex items-center gap-2.5">
+                <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-cyan-500/40 bg-slate-900 flex items-center justify-center p-0.5">
+                  <Image
+                    src="/images/pyhgoshift_ci.png"
+                    alt="PYHGOSHIFT Logo"
+                    width={32}
+                    height={32}
+                    className="object-contain w-full h-full"
+                  />
                 </div>
                 <span className="font-bold text-white text-base tracking-wider">PYHGOSHIFT</span>
               </div>
