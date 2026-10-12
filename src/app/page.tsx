@@ -732,6 +732,12 @@ export default function HomePage() {
               귀사의 SI 과업, PMO 자동화, 지능형 에이전트 도입에 관해 문의를 남겨주시면
               담당 에이전트가 검토 후 신속히 연락드립니다.
             </p>
+            <div className="mt-4 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/30 text-xs text-cyan-300 font-mono">
+              <span>공식 직통 채널:</span>
+              <a href="mailto:pyhgoshift@pyhgoshift.com" className="font-bold text-white underline hover:text-cyan-400 transition-colors">
+                pyhgoshift@pyhgoshift.com
+              </a>
+            </div>
           </div>
 
           <div className="glass-panel p-8 sm:p-10 rounded-3xl border border-slate-800">
@@ -878,7 +884,7 @@ export default function HomePage() {
                 <li>사명: 파이고시프트 (PYHGOSHIFT)</li>
                 <li>창업자: 박용희 (Park Yong-Hee)</li>
                 <li>도메인: www.pyhgoshift.com</li>
-                <li>이메일: pyhgoshift@gmail.com</li>
+                <li>이메일: pyhgoshift@pyhgoshift.com</li>
               </ul>
             </div>
 

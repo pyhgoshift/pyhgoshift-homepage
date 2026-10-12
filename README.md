@@ -2,7 +2,8 @@
 
 > **"자아를 훼방시켜, 규칙 안 숨겨진 가치를 발굴·극대화한다."**  
 > 공식 도메인: [www.pyhgoshift.com](https://www.pyhgoshift.com)  
-> 사내 서비스 서버: `http://192.168.64.31:80` (Nginx Gateway 연동)
+> 공식 이메일: [pyhgoshift@pyhgoshift.com](mailto:pyhgoshift@pyhgoshift.com)  
+> 사내 서비스 서버: `http://192.168.64.31:3001` (Nginx Gateway 연동)
 
 ---
 
