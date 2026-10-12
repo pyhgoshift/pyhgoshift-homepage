@@ -71,6 +71,67 @@ export async function POST(request: Request) {
       console.error("[PYHGOSHIFT File Save Error]:", fsErr);
     }
 
+    // [시냅스 박 / COO 슬랙 Webhook 실시간 통보 연동]
+    const slackWebhookUrl = process.env.SLACK_WEBHOOK_URL;
+    if (slackWebhookUrl) {
+      try {
+        const slackPayload = {
+          text: `🚨 *[PYHGOSHIFT] 신규 프로젝트/에이전트 상담 접수 알림*`,
+          blocks: [
+            {
+              type: "header",
+              text: {
+                type: "plain_text",
+                text: "🚀 [PYHGOSHIFT] 신규 상담 문의 접수",
+                emoji: true
+              }
+            },
+            {
+              type: "section",
+              fields: [
+                { type: "mrkdwn", text: `*성함/직책:*\n${inquiryRecord.name}` },
+                { type: "mrkdwn", text: `*회사/소속:*\n${inquiryRecord.company}` },
+                { type: "mrkdwn", text: `*이메일:*\n<mailto:${inquiryRecord.email}|${inquiryRecord.email}>` },
+                { type: "mrkdwn", text: `*관심 부문:*\n${inquiryRecord.division}` }
+              ]
+            },
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: `*문의 내용:*\n>>> ${inquiryRecord.message}`
+              }
+            },
+            {
+              type: "context",
+              elements: [
+                {
+                  type: "mrkdwn",
+                  text: `접수 시간: ${new Date(inquiryRecord.createdAt).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })} | 접수처: www.pyhgoshift.com`
+                }
+              ]
+            }
+          ]
+        };
+
+        const slackRes = await fetch(slackWebhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(slackPayload)
+        });
+
+        if (slackRes.ok) {
+          console.log("[PYHGOSHIFT Slack Gateway] Webhook message sent successfully.");
+        } else {
+          console.error("[PYHGOSHIFT Slack Gateway] Webhook failed:", slackRes.status, await slackRes.text());
+        }
+      } catch (slackErr) {
+        console.error("[PYHGOSHIFT Slack Gateway Error]:", slackErr);
+      }
+    } else {
+      console.log("[PYHGOSHIFT Slack Gateway] SLACK_WEBHOOK_URL is not configured. Saved to JSON only.");
+    }
+
     return NextResponse.json({
       success: true,
       message: "문의가 안전하게 접수되었습니다. pyhgoshift@pyhgoshift.com 전담 에이전트가 검토 후 신속히 회신드리겠습니다.",

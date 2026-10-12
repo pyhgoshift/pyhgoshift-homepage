@@ -10,3 +10,4 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-}
