@@ -75,14 +75,14 @@ export default function HomePage() {
       {/* 1. TOP NAVBAR */}
       <header className="sticky top-0 z-50 border-b border-[#2e2e2e]/70 bg-[#0b0b0b]/90 backdrop-blur-xl">
         <div className="max-w-[1200px] mx-auto px-6 h-18 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="relative w-9 h-9 rounded-xl overflow-hidden border border-[#2e2e2e] bg-[#141414] flex items-center justify-center p-0.5 group transition-all duration-300 hover:border-[#a881fe]">
+          <div className="flex items-center gap-3.5">
+            <div className="relative w-12 h-12 sm:w-13 sm:h-13 rounded-xl overflow-hidden border border-[#a881fe]/40 bg-[#141414] shadow-[0_0_16px_rgba(168,129,254,0.25)] flex items-center justify-center p-1 group transition-all duration-300 hover:border-[#a881fe] hover:shadow-[0_0_24px_rgba(168,129,254,0.5)]">
               <Image
-                src="/images/pyhgoshift_ci.png"
+                src="/images/pyhgoshift_symbol.png"
                 alt="PYHGOSHIFT Logo"
-                width={36}
-                height={36}
-                className="object-contain w-full h-full group-hover:scale-105 transition-transform"
+                width={52}
+                height={52}
+                className="object-contain w-full h-full group-hover:scale-110 transition-transform duration-300"
                 priority
               />
             </div>
@@ -151,16 +151,16 @@ export default function HomePage() {
           </div>
 
           {/* Official CI Centerpiece */}
-          <div className="relative mx-auto mb-10 w-44 sm:w-56 md:w-64 aspect-square flex items-center justify-center">
+          <div className="relative mx-auto mb-10 w-48 sm:w-60 md:w-72 aspect-square flex items-center justify-center">
             {/* Violet Glow Aura */}
-            <div className="absolute inset-0 rounded-full bg-[#a881fe]/20 blur-3xl pointer-events-none"></div>
-            <div className="relative w-full h-full p-3 rounded-2xl bg-[#141414] border border-[#2e2e2e] shadow-[0_12px_30px_-4px_rgba(3,3,3,0.6)] flex items-center justify-center hover:border-[#a881fe]/60 transition-all duration-300 group">
+            <div className="absolute inset-0 rounded-full bg-[#a881fe]/25 blur-3xl pointer-events-none"></div>
+            <div className="relative w-full h-full p-4 rounded-3xl bg-[#141414] border border-[#a881fe]/40 shadow-[0_12px_36px_-4px_rgba(168,129,254,0.35)] flex items-center justify-center hover:border-[#a881fe] transition-all duration-300 group">
               <Image
-                src="/images/pyhgoshift_ci.png"
-                alt="PYHGOSHIFT Official CI"
-                width={260}
-                height={260}
-                className="object-contain w-full h-full drop-shadow-[0_0_25px_rgba(168,129,254,0.45)] group-hover:drop-shadow-[0_0_35px_rgba(168,129,254,0.7)] transition-all duration-300"
+                src="/images/pyhgoshift_symbol.png"
+                alt="PYHGOSHIFT Official Symbol"
+                width={280}
+                height={280}
+                className="object-contain w-full h-full drop-shadow-[0_0_30px_rgba(168,129,254,0.6)] group-hover:scale-105 transition-all duration-300"
                 priority
               />
             </div>
@@ -353,13 +353,13 @@ export default function HomePage() {
           <div className="mt-8 uizard-card p-6 md:p-8 bg-gradient-to-r from-[#141414] via-[#120e24] to-[#141414] border border-[#2e2e2e]">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
               <div className="md:col-span-1 flex justify-center">
-                <div className="relative w-40 h-40 rounded-2xl bg-[#0b0b0b] border border-[#2e2e2e] p-3 shadow-[0_0_25px_rgba(168,129,254,0.3)] flex items-center justify-center">
+                <div className="relative w-44 h-44 rounded-2xl bg-[#0b0b0b] border border-[#a881fe]/40 p-3 shadow-[0_0_30px_rgba(168,129,254,0.35)] flex items-center justify-center">
                   <Image
-                    src="/images/pyhgoshift_ci.png"
+                    src="/images/pyhgoshift_symbol.png"
                     alt="PYHGOSHIFT CI Emblem"
-                    width={150}
-                    height={150}
-                    className="object-contain w-full h-full"
+                    width={170}
+                    height={170}
+                    className="object-contain w-full h-full drop-shadow-[0_0_20px_rgba(168,129,254,0.5)]"
                   />
                 </div>
               </div>
@@ -866,13 +866,13 @@ export default function HomePage() {
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div className="space-y-3">
-              <div className="flex items-center gap-2.5">
-                <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-[#2e2e2e] bg-[#141414] flex items-center justify-center p-0.5">
+              <div className="flex items-center gap-3">
+                <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-[#a881fe]/40 bg-[#141414] shadow-[0_0_12px_rgba(168,129,254,0.2)] flex items-center justify-center p-0.5">
                   <Image
-                    src="/images/pyhgoshift_ci.png"
+                    src="/images/pyhgoshift_symbol.png"
                     alt="PYHGOSHIFT Logo"
-                    width={32}
-                    height={32}
+                    width={40}
+                    height={40}
                     className="object-contain w-full h-full"
                   />
                 </div>
