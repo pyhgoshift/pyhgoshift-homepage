@@ -723,6 +723,30 @@ export default function HomePage() {
               </ul>
             </div>
           </div>
+
+          {/* AI-LLMCheck Architecture Tool Integration Card */}
+          <div className="mt-8 p-6 sm:p-8 rounded-2xl bg-[#14141d] border border-[#a881fe]/30 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden shadow-2xl">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[#a881fe]/15 text-[#a881fe] text-xs font-mono font-semibold">
+                ⭐ New Architecture Tool
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                AI-LLMCheck : 로컬 LLM VRAM 계산 & 하드웨어 진단 도구
+              </h3>
+              <p className="text-sm text-[#aeaeae] max-w-2xl leading-relaxed">
+                현재 접속 PC의 GPU(VRAM) 및 시스템 메모리를 실시간 진단하고, 102종 최신 LLM(Qwen 3, Llama 3.3, DeepSeek R1)의 최적 구동 가능 여부 및 파인튜닝 메모리를 정밀 시뮬레이션합니다.
+              </p>
+            </div>
+            <a
+              href="/tools/vram-calc/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-3.5 rounded-xl bg-[#a881fe] hover:bg-[#9063f2] text-black font-bold text-sm tracking-tight transition-all shrink-0 shadow-lg shadow-[#a881fe]/20 flex items-center gap-2 group"
+            >
+              <span>VRAM 진단기 실행하기</span>
+              <span className="group-hover:translate-x-1 transition-transform">→</span>
+            </a>
+          </div>
         </div>
       </section>
 
