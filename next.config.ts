@@ -12,6 +12,14 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  async rewrites() {
+    return [
+      {
+        source: "/tools/vram-calc/index.html",
+        destination: "/vram-calc.html",
+      },
+    ];
+  },
 };
 
 export default nextConfig;
