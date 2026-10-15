@@ -97,8 +97,8 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Desktop Navigation - 5대 명확한 메뉴 구조 */}
-          <nav className="hidden md:flex items-center space-x-7 text-sm font-medium text-[#c0c0c0]">
+          {/* Desktop Navigation - 5대 명확한 메뉴 구조 + AI 계산기 도구 */}
+          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium text-[#c0c0c0]">
             <a href="#philosophy" className="hover:text-white transition-colors flex items-center gap-1">
               <span>철학과 이념</span>
             </a>
@@ -110,6 +110,10 @@ export default function HomePage() {
             </a>
             <a href="#architecture" className="hover:text-white transition-colors flex items-center gap-1">
               <span>AgentOps 인프라</span>
+            </a>
+            <a href="/tools/vram-calc" className="text-[#a881fe] hover:text-[#c4a9fe] font-semibold transition-colors flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#a881fe]/10 border border-[#a881fe]/30 shadow-[0_0_12px_rgba(168,129,254,0.2)]">
+              <Zap className="w-3.5 h-3.5" />
+              <span>VRAM 계산기</span>
             </a>
             <a href="#contact" className="hover:text-white transition-colors flex items-center gap-1">
               <span>도입 문의</span>
@@ -147,6 +151,7 @@ export default function HomePage() {
             <a href="#council" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-white">2. 더 세븐 박 (7 Parks 집단지성)</a>
             <a href="#divisions" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-white">3. 5대 전략 사업부 (P-Y-H-G-O)</a>
             <a href="#architecture" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-white">4. AgentOps 기술 인프라</a>
+            <a href="/tools/vram-calc" onClick={() => setMobileMenuOpen(false)} className="block py-1.5 px-3 rounded-lg bg-[#a881fe]/15 text-[#ccb2ff] font-semibold border border-[#a881fe]/30">⚡ AI VRAM & 하드웨어 계산기 →</a>
             <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-[#a881fe] font-semibold">5. 에이전트 도입 상담 →</a>
           </div>
         )}
