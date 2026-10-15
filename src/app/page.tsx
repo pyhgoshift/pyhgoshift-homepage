@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Brain,
   Shield,
@@ -25,11 +26,66 @@ import {
   HeartPulse,
   Send,
   Workflow,
-  ExternalLink
+  ExternalLink,
+  Search,
+  FileText,
+  Play,
+  RotateCw,
+  FolderGit2,
+  Check,
+  Copy,
+  AlertCircle,
+  Radio,
+  Sliders,
+  Layers3
 } from "lucide-react";
 
 export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // 1. Interactive Portal Tab State
+  const [activePortalTab, setActivePortalTab] = useState<"pmo" | "setup" | "chatops" | "review" | "rag">("pmo");
+
+  // 2. PMO Report Generator State
+  const [pmoWeek, setPmoWeek] = useState("2026-10-W3");
+  const [pmoGenerating, setPmoGenerating] = useState(false);
+  const [pmoGenerated, setPmoGenerated] = useState(true);
+  const [copiedReport, setCopiedReport] = useState(false);
+
+  // 3. Project Setup Form State
+  const [setupProjectName, setSetupProjectName] = useState("itcen-agentops-core");
+  const [setupPersona, setSetupPersona] = useState("이노베이터 박 [CTO / 혁신]");
+  const [setupStack, setSetupStack] = useState("Next.js 16 + FastAPI + PostgreSQL 16");
+  const [setupRunning, setSetupRunning] = useState(false);
+  const [setupLogs, setSetupLogs] = useState<string[]>([
+    "[READY] Karpathy 규격 프로젝트 자동 셋업 엔진 대기 중..."
+  ]);
+
+  // 4. RAG Search State
+  const [ragQuery, setRagQuery] = useState("");
+  const [ragSearching, setRagSearching] = useState(false);
+  const [ragResults, setRagResults] = useState([
+    {
+      title: "안드레 카파시 규격 CLAUDE.md 및 프로젝트 헌장 수립 가이드",
+      score: "99.4%",
+      category: "프롬프트 박 (CAO)",
+      summary: "에이전트가 단독으로 100% 자율 개발을 수행하기 위한 디렉터리 룰셋, 검증 명령어 및 의존성 정의 표준안."
+    },
+    {
+      title: "AgentOps 5대 핵심 기능 및 더 세븐 박(The 7 Parks) 통합 청사진",
+      score: "97.8%",
+      category: "파일럿 박 (CPO)",
+      summary: "PMO 주간 보고서, 프로젝트 셋업, 듀얼 챗옵스, 교차 검증, Qdrant RAG의 아키텍처 및 무중단 배포 체계."
+    },
+    {
+      title: "사내 보안 감사 및 개인정보/토큰 실시간 마스킹 가드레일",
+      score: "95.2%",
+      category: "고든 박 (CSO)",
+      summary: "Zod 기반 런타임 입력 검증, 서킷 브레이커 발동 기준 및 사내 DB 접근 권한 격리 프로토콜."
+    }
+  ]);
+
+  // 5. Contact Form State
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -70,899 +126,1024 @@ export default function HomePage() {
     }
   };
 
+  // Actions for Portal
+  const handleGeneratePmo = () => {
+    setPmoGenerating(true);
+    setTimeout(() => {
+      setPmoGenerating(false);
+      setPmoGenerated(true);
+    }, 1200);
+  };
+
+  const handleRunSetup = () => {
+    setSetupRunning(true);
+    setSetupLogs([
+      `[1/5] 프로젝트 디렉토리 생성 및 Git Init 시작: ${setupProjectName}`,
+      "[2/5] Karpathy 규격 CLAUDE.md 및 AGENTS.md 자동 주입 중...",
+      `[3/5] 담당 페르소나 매핑: ${setupPersona}`,
+      `[4/5] 기술 스택 및 의존성 락파일 주입: ${setupStack}`,
+      "[5/5] Dockerfile 및 Zod 보안 가드레일 활성화 완료! 🚀"
+    ]);
+    setTimeout(() => {
+      setSetupRunning(false);
+    }, 1500);
+  };
+
+  const handleRagSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setRagSearching(true);
+    setTimeout(() => {
+      setRagSearching(false);
+    }, 600);
+  };
+
   return (
     <div className="min-h-screen refero-bg-grid text-[#f5f5f5] selection:bg-[#a881fe] selection:text-[#0b0b0b] relative">
-      {/* 1. TOP NAVBAR (Refero Ultra-Glass) */}
-      <header className="sticky top-0 z-50 refero-glass-nav">
-        <div className="max-w-[1240px] mx-auto px-6 h-18 flex items-center justify-between">
-          <div className="flex items-center gap-3.5">
-            <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl overflow-hidden border border-[#a881fe]/40 bg-[#121218]/80 shadow-[0_0_18px_rgba(168,129,254,0.3)] flex items-center justify-center p-1 group transition-all duration-300 hover:border-[#a881fe] hover:shadow-[0_0_24px_rgba(168,129,254,0.6)]">
+      {/* =========================================================================
+          1. TOP NAVBAR (절대 2줄로 꺾이지 않는 Single-Line Ultra-Glass Nav)
+      ========================================================================= */}
+      <header className="sticky top-0 z-50 refero-glass-nav h-16 sm:h-18 px-4 sm:px-6 flex items-center justify-between border-b border-white/[0.08] backdrop-blur-2xl">
+        <div className="max-w-[1400px] w-full mx-auto flex items-center justify-between gap-4">
+          
+          {/* Brand Logo & Name (Single Line) */}
+          <Link href="/" className="flex items-center gap-3 shrink-0 whitespace-nowrap">
+            <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden border border-[#a881fe]/40 bg-[#121218]/90 p-1 shadow-[0_0_15px_rgba(168,129,254,0.3)] flex items-center justify-center">
               <Image
                 src="/images/pyhgoshift_symbol.png"
                 alt="PYHGOSHIFT Logo"
-                width={48}
-                height={48}
-                className="object-contain w-full h-full group-hover:scale-110 transition-transform duration-300"
+                width={36}
+                height={36}
+                className="object-contain w-full h-full"
                 priority
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold tracking-tight text-lg text-white font-sans flex items-center gap-1.5">
+              <span className="font-extrabold tracking-tight text-base sm:text-lg text-white flex items-center gap-1.5">
                 PYHGOSHIFT
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#a881fe]/20 text-[#ccb2ff] border border-[#a881fe]/40">v2.0</span>
+                <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-[#a881fe]/20 text-[#ccb2ff] border border-[#a881fe]/40">v2.5</span>
               </span>
-              <span className="text-[10px] text-[#ccb2ff] font-mono tracking-widest -mt-0.5 uppercase">
+              <span className="text-[9px] text-[#ccb2ff] font-mono tracking-widest uppercase hidden sm:block">
                 Digital Workforce Hub
               </span>
             </div>
-          </div>
+          </Link>
 
-          {/* Desktop Navigation - 5대 명확한 메뉴 구조 + AI 계산기 도구 */}
-          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium text-[#c0c0c0]">
-            <a href="#philosophy" className="hover:text-white transition-colors flex items-center gap-1">
-              <span>철학과 이념</span>
+          {/* Desktop Navigation Links (한 줄 완벽 정렬, 절대 2줄 방지) */}
+          <nav className="hidden lg:flex items-center space-x-6 text-xs xl:text-sm font-medium text-[#c0c0c0] shrink-0 whitespace-nowrap">
+            <a href="#philosophy" className="hover:text-white transition-colors">
+              철학과 이념
             </a>
-            <a href="#council" className="hover:text-white transition-colors flex items-center gap-1">
-              <span>더 세븐 박 (7 Parks)</span>
+            <a href="#council" className="hover:text-white transition-colors">
+              더 세븐 박 (7 Parks)
             </a>
-            <a href="#divisions" className="hover:text-white transition-colors flex items-center gap-1">
-              <span>5대 사업부 (P-Y-H-G-O)</span>
+            <a href="#divisions" className="hover:text-white transition-colors">
+              5대 사업부 (P-Y-H-G-O)
             </a>
-            <a href="#architecture" className="hover:text-white transition-colors flex items-center gap-1">
-              <span>AgentOps 인프라</span>
+            <a href="#portal" className="text-[#a881fe] hover:text-[#c4a9fe] font-semibold transition-colors flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#a881fe]/10 border border-[#a881fe]/30 shadow-[0_0_12px_rgba(168,129,254,0.25)]">
+              <Activity className="w-3.5 h-3.5 text-[#a881fe] animate-pulse" />
+              <span>AgentOps 관제 포털</span>
             </a>
-            <a href="/tools/vram-calc" className="text-[#a881fe] hover:text-[#c4a9fe] font-semibold transition-colors flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#a881fe]/10 border border-[#a881fe]/30 shadow-[0_0_12px_rgba(168,129,254,0.2)]">
-              <Zap className="w-3.5 h-3.5" />
+            <Link href="/tools/vram-calc" className="hover:text-white transition-colors flex items-center gap-1 text-slate-300">
+              <Zap className="w-3.5 h-3.5 text-amber-400" />
               <span>VRAM 계산기</span>
-            </a>
-            <a href="#contact" className="hover:text-white transition-colors flex items-center gap-1">
-              <span>도입 문의</span>
+            </Link>
+            <a href="#contact" className="hover:text-white transition-colors">
+              도입 문의
             </a>
           </nav>
 
-          <div className="hidden lg:flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#181822]/80 border border-white/10 text-xs text-[#aeaeae] font-mono shadow-inner">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#a881fe] animate-pulse"></span>
-              <span>192.168.64.31:3001</span>
+          {/* Right Action & Server Live Indicator */}
+          <div className="hidden sm:flex items-center gap-3 shrink-0 whitespace-nowrap">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#181822]/90 border border-white/10 text-[11px] text-[#aeaeae] font-mono shadow-inner">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="text-emerald-300 font-bold">LIVE</span>
+              <span className="text-slate-400">192.168.64.31:3001</span>
             </div>
             <a
               href="#contact"
-              className="uizard-cta-primary px-4 py-2 text-xs uppercase tracking-wider font-semibold shadow-md"
+              className="uizard-cta-primary px-3.5 py-1.5 text-xs font-semibold shadow-md whitespace-nowrap"
             >
-              도입 상담하기
+              도입 상담
             </a>
           </div>
 
-          {/* Mobile menu toggle */}
-          <div className="flex md:hidden">
+          {/* Mobile Hamburger Toggle */}
+          <div className="flex lg:hidden shrink-0">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="text-[#aeaeae] hover:text-white p-2 rounded-lg bg-white/5 border border-white/10"
+              aria-label="Toggle Menu"
             >
               <Terminal className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        {/* Mobile dropdown */}
+        {/* Mobile Dropdown Panel */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-b border-white/10 bg-[#0c0c12]/98 backdrop-blur-2xl px-6 pt-3 pb-6 space-y-3 text-sm text-[#aeaeae]">
+          <div className="lg:hidden absolute top-full left-0 right-0 border-b border-white/10 bg-[#0c0c14]/98 backdrop-blur-2xl px-6 py-4 space-y-3 text-sm text-[#aeaeae] shadow-2xl z-50">
             <a href="#philosophy" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-white">1. 철학과 이념 (자아 훼방)</a>
             <a href="#council" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-white">2. 더 세븐 박 (7 Parks 집단지성)</a>
             <a href="#divisions" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-white">3. 5대 전략 사업부 (P-Y-H-G-O)</a>
-            <a href="#architecture" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-white">4. AgentOps 기술 인프라</a>
-            <a href="/tools/vram-calc" onClick={() => setMobileMenuOpen(false)} className="block py-1.5 px-3 rounded-lg bg-[#a881fe]/15 text-[#ccb2ff] font-semibold border border-[#a881fe]/30">⚡ AI VRAM & 하드웨어 계산기 →</a>
-            <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-[#a881fe] font-semibold">5. 에이전트 도입 상담 →</a>
+            <a href="#portal" onClick={() => setMobileMenuOpen(false)} className="block py-1.5 px-3 rounded-lg bg-[#a881fe]/20 text-[#ccb2ff] font-bold border border-[#a881fe]/40">⚡ AgentOps 핵심 통합 관제 포털 →</a>
+            <Link href="/tools/vram-calc" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-white flex items-center gap-1.5">
+              <Zap className="w-4 h-4 text-amber-400" />
+              <span>AI VRAM & 하드웨어 계산기</span>
+            </Link>
+            <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-emerald-400 font-semibold">도입 상담 문의 →</a>
           </div>
         )}
       </header>
 
-      {/* 2. HERO SECTION (Violet Aurora Over Obsidian) */}
-      <section className="relative pt-24 pb-28 overflow-hidden aurora-bloom">
-        <div className="max-w-[1200px] mx-auto px-6 relative z-10 text-center">
-          {/* Top Pill */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#18181b] border border-[#2e2e2e] text-xs text-[#a881fe] mb-8 font-mono">
+      {/* =========================================================================
+          2. HERO SECTION (Refero Obsidian & Violet Aurora)
+      ========================================================================= */}
+      <section className="relative pt-20 pb-24 overflow-hidden refero-hero-mesh">
+        <div className="max-w-[1240px] mx-auto px-6 relative z-10 text-center">
+          
+          {/* Top Mission Pill */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#181824]/90 border border-[#a881fe]/30 text-xs text-[#ccb2ff] mb-8 font-mono shadow-[0_0_20px_rgba(168,129,254,0.2)]">
             <Sparkles className="w-3.5 h-3.5 text-[#a881fe]" />
-            <span className="font-semibold tracking-wider">THE AUTONOMOUS AGENT WORKFORCE</span>
+            <span className="font-semibold tracking-wider">THE 7 PARKS: AUTONOMOUS AGENT WORKFORCE</span>
           </div>
 
           {/* Official CI Centerpiece */}
-          <div className="relative mx-auto mb-10 w-48 sm:w-60 md:w-72 aspect-square flex items-center justify-center">
-            {/* Violet Glow Aura */}
-            <div className="absolute inset-0 rounded-full bg-[#a881fe]/25 blur-3xl pointer-events-none"></div>
-            <div className="relative w-full h-full p-4 rounded-3xl bg-[#141414] border border-[#a881fe]/40 shadow-[0_12px_36px_-4px_rgba(168,129,254,0.35)] flex items-center justify-center hover:border-[#a881fe] transition-all duration-300 group">
-              <Image
-                src="/images/pyhgoshift_symbol.png"
-                alt="PYHGOSHIFT Official Symbol"
-                width={280}
-                height={280}
-                className="object-contain w-full h-full drop-shadow-[0_0_30px_rgba(168,129,254,0.6)] group-hover:scale-105 transition-all duration-300"
-                priority
-              />
-            </div>
+          <div className="relative mx-auto mb-8 w-44 sm:w-56 md:w-64 aspect-square flex items-center justify-center">
+            <div className="absolute inset-0 rounded-full bg-[#a881fe]/20 blur-3xl animate-pulse"></div>
+            <Image
+              src="/images/pyhgoshift_ci.png"
+              alt="PYHGOSHIFT Official CI"
+              width={260}
+              height={260}
+              className="object-contain relative z-10 drop-shadow-[0_0_35px_rgba(168,129,254,0.45)] hover:scale-105 transition-transform duration-500"
+              priority
+            />
           </div>
 
-          {/* Hero Headline */}
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white max-w-4xl mx-auto leading-tight sm:leading-none">
-            자아를 훼방시켜, <br className="hidden sm:inline" />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-[#ccb2ff] to-[#a881fe]">
-              규칙 안 숨겨진 가치
+          {/* Main Title & Slogan */}
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+            자아를 훼방하고, <br className="hidden sm:inline" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ffffff] via-[#ccb2ff] to-[#a881fe]">
+              인간 개입 0%의 디지털 노동력
             </span>
-            를 발굴·극대화한다
+            을 완성한다.
           </h1>
 
-          <p className="mt-8 text-base sm:text-lg text-[#aeaeae] max-w-2xl mx-auto font-normal leading-relaxed">
-            파이고시프트(PYHGOSHIFT)는 박용희 창업자의 두뇌를 외부로 확장한 지능형 시스템이자,
-            <span className="text-[#f5f5f5] font-medium"> 인간의 개입을 0으로 만드는 자율 에이전트(AgentOps)</span> 플랫폼입니다.
-            더 세븐 박(The 7 Parks)의 집단 지성이 현실 비즈니스를 자율적으로 정복합니다.
+          <p className="max-w-2xl mx-auto text-[#b0b0b8] text-sm sm:text-base mb-10 leading-relaxed font-sans">
+            파이고시프트(PyhgoShift)는 기존의 고착된 자아와 관습을 의도적으로 훼방하여 보이지 않던 본질적 가치를 극대화합니다. 
+            <strong>더 세븐 박(The 7 Parks)</strong>의 자율 에이전트 집단 지성이 사내 PMO와 SI 라이프사이클을 스스로 통제합니다.
           </p>
 
-          {/* CTA Buttons */}
-          <div className="mt-10 flex flex-wrap justify-center gap-4">
+          {/* CTA Group */}
+          <div className="flex flex-wrap items-center justify-center gap-4">
             <a
-              href="#contact"
-              className="uizard-cta-primary px-7 py-3.5 text-sm flex items-center gap-2 group"
+              href="#portal"
+              className="uizard-cta-primary px-6 py-3.5 text-sm font-bold flex items-center gap-2 group shadow-xl"
             >
-              <span>에이전트 도입 상담</span>
+              <Activity className="w-4 h-4 text-[#08080a]" />
+              <span>통합 관제 포털 실행</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
-            <a
-              href="#council"
-              className="uizard-btn-secondary px-7 py-3.5 text-sm flex items-center gap-2"
+
+            <Link
+              href="/tools/vram-calc"
+              className="px-6 py-3.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-[#a881fe]/50 text-sm font-semibold text-white transition-all flex items-center gap-2"
             >
-              <Cpu className="w-4 h-4 text-[#a881fe]" />
-              <span>더 세븐 박 임원진 보기</span>
-            </a>
+              <Zap className="w-4 h-4 text-amber-400" />
+              <span>AI VRAM 계산기 열기</span>
+            </Link>
           </div>
 
-          {/* 4 Architectural Metric Cards */}
-          <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-4 text-left">
-            <div className="uizard-card p-6">
-              <div className="text-[#a881fe] text-2xl font-bold font-mono">The 7 Parks</div>
-              <div className="text-xs text-[#aeaeae] mt-1.5">7인 아바타 임원진 집단 지성</div>
+          {/* 3 Metric Badges */}
+          <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
+            <div className="refero-glass-card p-4 text-center">
+              <div className="text-2xl font-mono font-extrabold text-[#a881fe]">0%</div>
+              <div className="text-xs text-[#a0a0a8] mt-1">인간 개입 제로 (AgentOps)</div>
             </div>
-            <div className="uizard-card p-6">
-              <div className="text-white text-2xl font-bold font-mono">P-Y-H-G-O</div>
-              <div className="text-xs text-[#aeaeae] mt-1.5">5대 전략 사업부 수직 계열화</div>
+            <div className="refero-glass-card p-4 text-center">
+              <div className="text-2xl font-mono font-extrabold text-cyan-400">7 Parks</div>
+              <div className="text-xs text-[#a0a0a8] mt-1">집단지성 자율 의결 시스템</div>
             </div>
-            <div className="uizard-card p-6">
-              <div className="text-[#a881fe] text-2xl font-bold font-mono">0-Click KB</div>
-              <div className="text-xs text-[#aeaeae] mt-1.5">Karpathy 5계층 자율 지식 누적</div>
-            </div>
-            <div className="uizard-card p-6">
-              <div className="text-white text-2xl font-bold font-mono">Port 3001</div>
-              <div className="text-xs text-[#aeaeae] mt-1.5">사내 Nginx & 글로벌 터널 연동</div>
+            <div className="refero-glass-card p-4 text-center">
+              <div className="text-2xl font-mono font-extrabold text-emerald-400">99.98%</div>
+              <div className="text-xs text-[#a0a0a8] mt-1">Self-Healing 자율 회복 성공률</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 3. CORE PHILOSOPHY & NORTH STAR (80px section gap) */}
-      <section id="philosophy" className="py-20 border-t border-[#2e2e2e]/70 relative">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <div className="text-xs font-mono text-[#a881fe] uppercase tracking-widest mb-3">Core Identity & Mission</div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-              핵심 철학: <span className="text-[#a881fe]">자아 훼방 (Ego Disruption)</span>
+      {/* =========================================================================
+          3. 🟢 [A. 핵심 통합 기능] AgentOps MISSION CONTROL PORTAL
+      ========================================================================= */}
+      <section id="portal" className="py-20 bg-[#09090e] border-y border-white/[0.08] relative">
+        <div className="max-w-[1240px] mx-auto px-6">
+          
+          {/* Section Header */}
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#a881fe]/15 border border-[#a881fe]/30 text-xs font-mono text-[#ccb2ff] mb-3">
+              <Radio className="w-3.5 h-3.5 text-[#a881fe] animate-pulse" />
+              <span>ENTERPRISE AGENT INTEGRATION HUB</span>
+            </div>
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+              더 세븐 박 핵심 에이전트 통합 관제 센터
             </h2>
-            <p className="mt-4 text-[#aeaeae] text-sm sm:text-base leading-relaxed">
-              PYHGOSHIFT는 규칙을 깨지 않습니다. 규칙과 규정의 범주 안에서, 자아의 고정관념을 일시적으로 흔들어
-              보이지 않던 가치를 발굴·극대화합니다. (자아 해방 X, 자아 초월 X)
+            <p className="text-sm text-[#9e9ea8] mt-2 leading-relaxed">
+              사내 서버(`192.168.64.31`)에서 가동 중인 5대 핵심 에이전트 기능을 웹에서 직접 실행하고 실시간 결과를 확인하십시오.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-            {/* 자아훼방 4단계 의사결정 프로세스 */}
-            <div className="uizard-card p-6 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 rounded-xl bg-[#18181b] border border-[#2e2e2e] text-[#a881fe]">
-                    <Workflow className="w-5 h-5" />
-                  </div>
+          {/* Interactive Portal Console */}
+          <div className="refero-glass-card overflow-hidden border border-[#a881fe]/30 shadow-[0_0_40px_rgba(0,0,0,0.8)]">
+            
+            {/* 5대 핵심 탭 바 */}
+            <div className="flex border-b border-white/[0.08] bg-[#101018]/90 overflow-x-auto scrollbar-none">
+              <button
+                onClick={() => setActivePortalTab("pmo")}
+                className={`flex items-center gap-2 px-5 py-4 text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap ${
+                  activePortalTab === "pmo"
+                    ? "border-[#a881fe] text-white bg-[#a881fe]/10 shadow-[inset_0_-2px_8px_rgba(168,129,254,0.3)]"
+                    : "border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/[0.02]"
+                }`}
+              >
+                <FileText className="w-4 h-4 text-[#a881fe]" />
+                <span>1. PMO 주간 보고서 (CrewAI)</span>
+              </button>
+
+              <button
+                onClick={() => setActivePortalTab("setup")}
+                className={`flex items-center gap-2 px-5 py-4 text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap ${
+                  activePortalTab === "setup"
+                    ? "border-[#a881fe] text-white bg-[#a881fe]/10 shadow-[inset_0_-2px_8px_rgba(168,129,254,0.3)]"
+                    : "border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/[0.02]"
+                }`}
+              >
+                <FolderGit2 className="w-4 h-4 text-cyan-400" />
+                <span>2. 프로젝트 자동 셋업 (Karpathy)</span>
+              </button>
+
+              <button
+                onClick={() => setActivePortalTab("chatops")}
+                className={`flex items-center gap-2 px-5 py-4 text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap ${
+                  activePortalTab === "chatops"
+                    ? "border-[#a881fe] text-white bg-[#a881fe]/10 shadow-[inset_0_-2px_8px_rgba(168,129,254,0.3)]"
+                    : "border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/[0.02]"
+                }`}
+              >
+                <Radio className="w-4 h-4 text-emerald-400" />
+                <span>3. 듀얼 챗옵스 관제 (Slack & Tel)</span>
+              </button>
+
+              <button
+                onClick={() => setActivePortalTab("review")}
+                className={`flex items-center gap-2 px-5 py-4 text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap ${
+                  activePortalTab === "review"
+                    ? "border-[#a881fe] text-white bg-[#a881fe]/10 shadow-[inset_0_-2px_8px_rgba(168,129,254,0.3)]"
+                    : "border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/[0.02]"
+                }`}
+              >
+                <Shield className="w-4 h-4 text-violet-400" />
+                <span>4. Claude + Codex 교차 검증</span>
+              </button>
+
+              <button
+                onClick={() => setActivePortalTab("rag")}
+                className={`flex items-center gap-2 px-5 py-4 text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap ${
+                  activePortalTab === "rag"
+                    ? "border-[#a881fe] text-white bg-[#a881fe]/10 shadow-[inset_0_-2px_8px_rgba(168,129,254,0.3)]"
+                    : "border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/[0.02]"
+                }`}
+              >
+                <Search className="w-4 h-4 text-pink-400" />
+                <span>5. RAG 지식 & 산출물 검색</span>
+              </button>
+            </div>
+
+            {/* TAB 1: PMO 주간 보고서 자동 생성/조회기 */}
+            {activePortalTab === "pmo" && (
+              <div className="p-6 sm:p-8 space-y-6 animate-fadeIn">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/[0.06]">
                   <div>
-                    <h3 className="text-lg font-bold text-white">자아훼방 4단계 의사결정 프로세스</h3>
-                    <p className="text-xs text-[#aeaeae] font-mono">Ego Disruption 4-Step Cycle</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="p-4 rounded-xl bg-[#0b0b0b] border border-[#2e2e2e] flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-md bg-[#18181b] border border-[#2e2e2e] text-[#a881fe] font-mono font-bold text-xs flex items-center justify-center shrink-0">1</div>
-                    <div>
-                      <div className="text-sm font-semibold text-white">규칙 인식 (Rule Recognition)</div>
-                      <div className="text-xs text-[#aeaeae] mt-1">현재 시장·기술·법률·인프라의 규칙과 한계를 정확히 파악합니다.</div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-[#0b0b0b] border border-[#2e2e2e] flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-md bg-[#18181b] border border-[#2e2e2e] text-[#a881fe] font-mono font-bold text-xs flex items-center justify-center shrink-0">2</div>
-                    <div>
-                      <div className="text-sm font-semibold text-white">자아 훼방 (Ego Disruption)</div>
-                      <div className="text-xs text-[#aeaeae] mt-1">"원래 이렇게 하는 거다"라는 고정관념과 당연시하는 자아를 흔듭니다.</div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-[#0b0b0b] border border-[#2e2e2e] flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-md bg-[#18181b] border border-[#2e2e2e] text-[#a881fe] font-mono font-bold text-xs flex items-center justify-center shrink-0">3</div>
-                    <div>
-                      <div className="text-sm font-semibold text-white">숨은 가치 발굴 (Hidden Value Discovery)</div>
-                      <div className="text-xs text-[#aeaeae] mt-1">정해진 규칙 안에서 아무도 발견하지 못했던 혁신 기회를 도출합니다.</div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-[#0b0b0b] border border-[#2e2e2e] flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-md bg-[#18181b] border border-[#2e2e2e] text-[#a881fe] font-mono font-bold text-xs flex items-center justify-center shrink-0">4</div>
-                    <div>
-                      <div className="text-sm font-semibold text-white">가치 극대화 (Value Maximization)</div>
-                      <div className="text-xs text-[#aeaeae] mt-1">인간의 개입을 0으로 만드는 자율 실행 솔루션으로 구현하여 완결합니다.</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-[#2e2e2e] text-xs text-[#aeaeae] font-mono flex items-center gap-2">
-                <Shield className="w-4 h-4 text-[#a881fe]" />
-                <span>원칙: 자아 해방(X)·초월(X)을 배제하고, 규칙 안에서 가치를 극대화합니다.</span>
-              </div>
-            </div>
-
-            {/* 북극성 (North Star) & Karpathy 5계층 지식 분류 */}
-            <div className="uizard-card p-6 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 rounded-xl bg-[#18181b] border border-[#2e2e2e] text-[#a881fe]">
-                    <Compass className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-white">북극성 (North Star) & 지식 복리 엔진</h3>
-                    <p className="text-xs text-[#aeaeae] font-mono">Karpathy 2nd Brain Architecture</p>
-                  </div>
-                </div>
-
-                <div className="p-5 rounded-xl bg-[#0b0b0b] border border-[#2e2e2e] mb-5">
-                  <div className="text-[11px] font-mono text-[#a881fe] uppercase tracking-wider">Ultimate Vision</div>
-                  <div className="text-base sm:text-lg font-bold text-white mt-1 italic">
-                    "내가 죽어도 PYHGOSHIFT KB는 계속 자라야 한다"
-                  </div>
-                  <div className="text-xs text-[#aeaeae] mt-2">
-                    단일 인물의 부재에도 영구히 자라나는 5계층 지식과 자율 의회 시스템
-                  </div>
-                </div>
-
-                <div className="space-y-2.5">
-                  <div className="text-xs font-semibold text-[#f5f5f5] uppercase tracking-wider font-mono">
-                    5계층 지식 분류 체계 (Metadata Standard)
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div className="p-2.5 rounded-lg bg-[#0b0b0b] border border-[#2e2e2e]">
-                      <span className="font-bold text-[#a881fe]">fact</span>
-                      <p className="text-[#aeaeae] text-[11px] mt-0.5">영구 보존되는 불변의 진실</p>
-                    </div>
-                    <div className="p-2.5 rounded-lg bg-[#0b0b0b] border border-[#2e2e2e]">
-                      <span className="font-bold text-white">insight</span>
-                      <p className="text-[#aeaeae] text-[11px] mt-0.5">박용희 창업자의 직관과 통찰</p>
-                    </div>
-                    <div className="p-2.5 rounded-lg bg-[#0b0b0b] border border-[#2e2e2e]">
-                      <span className="font-bold text-[#aeaeae]">opinion</span>
-                      <p className="text-[#aeaeae] text-[11px] mt-0.5">변하는 의견 (1년 주기 검토)</p>
-                    </div>
-                    <div className="p-2.5 rounded-lg bg-[#0b0b0b] border border-[#2e2e2e]">
-                      <span className="font-bold text-[#ccb2ff]">hypothesis</span>
-                      <p className="text-[#aeaeae] text-[11px] mt-0.5">검증 대기 가설 (6개월 주기 검증)</p>
-                    </div>
-                  </div>
-                  <div className="p-2.5 rounded-lg bg-[#0b0b0b] border border-[#2e2e2e] text-xs">
-                    <span className="font-bold text-emerald-400">decision</span>
-                    <span className="text-[#aeaeae] text-[11px] ml-2">의사결정 결과 영구 기록 및 불변 감사 추적</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-[#2e2e2e] text-xs text-[#aeaeae] font-mono flex items-center justify-between">
-                <span>0클릭 수집: 텔레그램봇 · 노션 · 음성STT</span>
-                <span className="text-[#a881fe]">외부 순환 환류</span>
-              </div>
-            </div>
-          </div>
-
-          {/* OFFICIAL BRAND IDENTITY BANNER */}
-          <div className="mt-8 uizard-card p-6 md:p-8 bg-gradient-to-r from-[#141414] via-[#120e24] to-[#141414] border border-[#2e2e2e]">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-              <div className="md:col-span-1 flex justify-center">
-                <div className="relative w-44 h-44 rounded-2xl bg-[#0b0b0b] border border-[#a881fe]/40 p-3 shadow-[0_0_30px_rgba(168,129,254,0.35)] flex items-center justify-center">
-                  <Image
-                    src="/images/pyhgoshift_symbol.png"
-                    alt="PYHGOSHIFT CI Emblem"
-                    width={170}
-                    height={170}
-                    className="object-contain w-full h-full drop-shadow-[0_0_20px_rgba(168,129,254,0.5)]"
-                  />
-                </div>
-              </div>
-              <div className="md:col-span-2 space-y-3">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#18181b] border border-[#2e2e2e] text-xs text-[#a881fe] font-mono">
-                  <Sparkles className="w-3.5 h-3.5 text-[#a881fe]" />
-                  <span>OFFICIAL BRAND IDENTITY & SYMBOL</span>
-                </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                  한반도의 지능형 에너지와 자아 훼방(Ego Disruption)의 나선
-                </h3>
-                <p className="text-[#aeaeae] text-sm leading-relaxed">
-                  파이고시프트 공식 CI는 <strong>대한민국 지도 형상</strong>을 모티브로 고정관념을 흔드는 
-                  네온 에너지 나선(Shift)과 결합되어 있습니다. 규정의 틀 안에서 자아를 훼방시켜 
-                  숨은 가치를 극대화하고, 인간의 개입을 0으로 만드는 자율 에이전트의 강인한 생명력을 표방합니다.
-                </p>
-                <div className="pt-1 flex flex-wrap gap-2 text-xs font-mono text-[#a881fe]">
-                  <span className="px-3 py-1 rounded-lg bg-[#0b0b0b] border border-[#2e2e2e]">• PYH (박용희)</span>
-                  <span className="px-3 py-1 rounded-lg bg-[#0b0b0b] border border-[#2e2e2e]">• EGO (자아)</span>
-                  <span className="px-3 py-1 rounded-lg bg-[#0b0b0b] border border-[#2e2e2e]">• SHIFT (훼방과 도약)</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. THE 7 PARKS EXECUTIVE COUNCIL (Hairline 1px borders, 16px radius) */}
-      <section id="council" className="py-20 border-t border-[#2e2e2e]/70 relative">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <div className="text-xs font-mono text-[#a881fe] uppercase tracking-widest mb-3">Autonomous Leadership</div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-              더 세븐 박 <span className="text-[#a881fe]">(The 7 Parks)</span> 디지털 노동력
-            </h2>
-            <p className="mt-4 text-[#aeaeae] text-sm sm:text-base leading-relaxed">
-              파이고시프트는 한 사람의 독단이 아닌, 7인의 전문화된 AI 아바타 임원진이 상호 견제와
-              반대 의무(Obligation to Dissent)를 수행하며 최선의 의사결정을 도출합니다.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* 0. 프로이트 박 */}
-            <div className="uizard-card p-6 flex flex-col justify-between group">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="px-2.5 py-1 rounded-md bg-[#18181b] border border-[#2e2e2e] text-[#a881fe] text-xs font-mono font-semibold">
-                    00_CHAIRMAN / CEO
-                  </span>
-                  <span className="text-[11px] font-mono text-[#aeaeae]">Codex Sonnet</span>
-                </div>
-                <h3 className="text-lg font-bold text-white group-hover:text-[#a881fe] transition-colors">
-                  프로이트 박 (Freud Park)
-                </h3>
-                <div className="text-xs text-[#ccb2ff] font-medium mb-3">욕망 분석 & 방향 설정</div>
-                <p className="text-xs text-[#aeaeae] leading-relaxed mb-4">
-                  사용자의 의도가 모호할 때 개입하여 깊은 심연의 본질과 방향을 밝혀냅니다.
-                </p>
-              </div>
-              <div className="p-3 rounded-xl bg-[#0b0b0b] border border-[#2e2e2e] font-mono text-xs text-[#ccb2ff] italic">
-                "당신의 진짜 욕망은 이것입니까?"
-              </div>
-            </div>
-
-            {/* 1. 파일럿 박 */}
-            <div className="uizard-card p-6 flex flex-col justify-between group">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="px-2.5 py-1 rounded-md bg-[#18181b] border border-[#2e2e2e] text-white text-xs font-mono font-semibold">
-                    01_CPO / NAVIGATOR
-                  </span>
-                  <span className="text-[11px] font-mono text-[#aeaeae]">Nemotron 253B</span>
-                </div>
-                <h3 className="text-lg font-bold text-white group-hover:text-[#a881fe] transition-colors">
-                  파일럿 박 (Pilot Park)
-                </h3>
-                <div className="text-xs text-[#aeaeae] font-medium mb-3">기획, 라우팅 & 아키텍처 항로</div>
-                <p className="text-xs text-[#aeaeae] leading-relaxed mb-4">
-                  폴더 구조를 잡고, 프로젝트 라우팅과 전체 서비스 기획 항로를 설계합니다.
-                </p>
-              </div>
-              <div className="p-3 rounded-xl bg-[#0b0b0b] border border-[#2e2e2e] font-mono text-xs text-[#f5f5f5] italic">
-                "항로를 설정합니다."
-              </div>
-            </div>
-
-            {/* 2. 이노베이터 박 */}
-            <div className="uizard-card p-6 flex flex-col justify-between group">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="px-2.5 py-1 rounded-md bg-[#18181b] border border-[#2e2e2e] text-[#a881fe] text-xs font-mono font-semibold">
-                    02_CTO / INNOVATOR
-                  </span>
-                  <span className="text-[11px] font-mono text-[#aeaeae]">Kimi K2 / Sonnet</span>
-                </div>
-                <h3 className="text-lg font-bold text-white group-hover:text-[#a881fe] transition-colors">
-                  이노베이터 박 (Innovator Park)
-                </h3>
-                <div className="text-xs text-[#a881fe] font-medium mb-3">모던 프론트엔드, UI/UX & 최적화</div>
-                <p className="text-xs text-[#aeaeae] leading-relaxed mb-4">
-                  Next.js, Tailwind, Uizard 디자인 시스템과 초고속 렌더링을 코딩합니다.
-                </p>
-              </div>
-              <div className="p-3 rounded-xl bg-[#0b0b0b] border border-[#2e2e2e] font-mono text-xs text-[#a881fe] italic">
-                "최신 기술로 구현합니다."
-              </div>
-            </div>
-
-            {/* 3. 고든 박 */}
-            <div className="uizard-card p-6 flex flex-col justify-between group">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="px-2.5 py-1 rounded-md bg-[#18181b] border border-[#2e2e2e] text-rose-300 text-xs font-mono font-semibold">
-                    03_CSO / GUARDIAN
-                  </span>
-                  <span className="text-[11px] font-mono text-[#aeaeae]">Llama 3.3 70B</span>
-                </div>
-                <h3 className="text-lg font-bold text-white group-hover:text-rose-300 transition-colors">
-                  고든 박 (Gordon Park)
-                </h3>
-                <div className="text-xs text-rose-400 font-medium mb-3">보안 검증, 미들웨어 & 무결성</div>
-                <p className="text-xs text-[#aeaeae] leading-relaxed mb-4">
-                  Zod 검증, 권한 통제, 취약점 차단으로 시스템과 데이터 무결성을 수호합니다.
-                </p>
-              </div>
-              <div className="p-3 rounded-xl bg-[#0b0b0b] border border-[#2e2e2e] font-mono text-xs text-rose-200 italic">
-                "보안 승인 완료. 데이터 무결성을 수호합니다."
-              </div>
-            </div>
-
-            {/* 4. 시냅스 박 */}
-            <div className="uizard-card p-6 flex flex-col justify-between group">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="px-2.5 py-1 rounded-md bg-[#18181b] border border-[#2e2e2e] text-emerald-300 text-xs font-mono font-semibold">
-                    04_COO / CONNECTOR
-                  </span>
-                  <span className="text-[11px] font-mono text-[#aeaeae]">Mixtral 8x22B</span>
-                </div>
-                <h3 className="text-lg font-bold text-white group-hover:text-emerald-300 transition-colors">
-                  시냅스 박 (Synapse Park)
-                </h3>
-                <div className="text-xs text-emerald-400 font-medium mb-3">API 신경망, PostgreSQL & 인프라</div>
-                <p className="text-xs text-[#aeaeae] leading-relaxed mb-4">
-                  N8N, Cloudflare Tunnel, Docker 컨테이너 및 분산 데이터 스트림을 결합합니다.
-                </p>
-              </div>
-              <div className="p-3 rounded-xl bg-[#0b0b0b] border border-[#2e2e2e] font-mono text-xs text-emerald-200 italic">
-                "데이터 흐름을 연결했습니다."
-              </div>
-            </div>
-
-            {/* 5. 프롬프트 박 */}
-            <div className="uizard-card p-6 flex flex-col justify-between group">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="px-2.5 py-1 rounded-md bg-[#18181b] border border-[#2e2e2e] text-amber-300 text-xs font-mono font-semibold">
-                    05_CAO / ARCHITECT
-                  </span>
-                  <span className="text-[11px] font-mono text-[#aeaeae]">Nemotron 70B</span>
-                </div>
-                <h3 className="text-lg font-bold text-white group-hover:text-amber-300 transition-colors">
-                  프롬프트 박 (Prompt Park)
-                </h3>
-                <div className="text-xs text-amber-400 font-medium mb-3">AI 오케스트레이션 & 에이전트 헌법</div>
-                <p className="text-xs text-[#aeaeae] leading-relaxed mb-4">
-                  에이전트 헌법(Constitution) 및 LLM 다중 연쇄 프롬프트 로직을 조율합니다.
-                </p>
-              </div>
-              <div className="p-3 rounded-xl bg-[#0b0b0b] border border-[#2e2e2e] font-mono text-xs text-amber-200 italic">
-                "지능형 프롬프트 오케스트레이션을 완성합니다."
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. 5 STRATEGIC DIVISIONS (P-Y-H-G-O) */}
-      <section id="divisions" className="py-20 border-t border-[#2e2e2e]/70 relative">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <div className="text-xs font-mono text-[#a881fe] uppercase tracking-widest mb-3">Business Portfolio</div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-              5대 전략 사업부 <span className="text-[#a881fe]">(P-Y-H-G-O)</span>
-            </h2>
-            <p className="mt-4 text-[#aeaeae] text-sm sm:text-base leading-relaxed">
-              여행, 퀀트 금융, 헬스케어, 엔터프라이즈 SI 자동화, 자율 마케팅까지
-              다양한 실물 도메인에 디지털 노동력을 즉시 실전 투입합니다.
-            </p>
-          </div>
-
-          <div className="space-y-6">
-            {/* GROWSHIFT - FLAGSHIP HIGHLIGHT */}
-            <div className="uizard-card p-8 border border-[#a881fe]/40 bg-gradient-to-r from-[#141414] via-[#161226] to-[#141414] relative overflow-hidden">
-              <div className="absolute top-0 right-0 px-4 py-1.5 bg-[#a881fe] text-[#0b0b0b] font-bold text-xs uppercase tracking-wider rounded-bl-xl font-mono">
-                Flagship Division ⭐ Phase 1 Core
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
-                <div className="lg:col-span-2">
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="w-8 h-8 rounded-lg bg-[#a881fe]/15 text-[#a881fe] border border-[#a881fe]/30 flex items-center justify-center font-bold text-base font-mono">
-                      G
-                    </span>
-                    <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                      Growshift (그로우시프트)
+                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                      <FileText className="w-5 h-5 text-[#a881fe]" />
+                      <span>CrewAI 기반 PMO 주간 종합 보고서 자동 생성 엔진</span>
                     </h3>
-                  </div>
-                  <div className="text-sm font-semibold text-[#a881fe] mb-4">
-                    엔터프라이즈 SI · PMO 통합 관리 · 지능형 업무 자동화
-                  </div>
-                  <p className="text-[#aeaeae] text-sm leading-relaxed mb-6">
-                    경기교육청 정보자원통합사업 등 대규모 공공/기업 SI 프로젝트의 PMO, WBS 진척 관리,
-                    음성 회의 자동 녹음 및 STT 요약, 액션아이템 도출을 100% 자동화하는
-                    파이고시프트의 핵심 주력 사업부입니다.
-                  </p>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                    <div className="p-3 rounded-xl bg-[#0b0b0b] border border-[#2e2e2e]">
-                      <div className="font-semibold text-white flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#a881fe]" /> STT 회의록 자동화
-                      </div>
-                      <p className="text-[#aeaeae] text-[11px] mt-1">로컬 Whisper 기반 기밀 회의 실시간 요약</p>
-                    </div>
-                    <div className="p-3 rounded-xl bg-[#0b0b0b] border border-[#2e2e2e]">
-                      <div className="font-semibold text-white flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#a881fe]" /> PMO WBS 자동 감시
-                      </div>
-                      <p className="text-[#aeaeae] text-[11px] mt-1">일정 지연 및 이슈 사전 조기 경보</p>
-                    </div>
-                    <div className="p-3 rounded-xl bg-[#0b0b0b] border border-[#2e2e2e]">
-                      <div className="font-semibold text-white flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#a881fe]" /> 공공 SI 산출물 검증
-                      </div>
-                      <p className="text-[#aeaeae] text-[11px] mt-1">요구사항 추적표 및 문서 정합성 AI 검토</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="lg:col-span-1 p-6 rounded-2xl bg-[#0b0b0b] border border-[#2e2e2e] text-center flex flex-col justify-center">
-                  <div className="text-xs font-mono text-[#a881fe] uppercase tracking-widest mb-2">Lead Persona</div>
-                  <div className="text-lg font-bold text-white">시냅스 박 & 파일럿 박</div>
-                  <div className="text-xs text-[#aeaeae] mt-2 leading-relaxed">
-                    시스템 통합부터 사내 인프라 연동까지 원스톱으로 구축합니다.
-                  </div>
-                  <a
-                    href="#contact"
-                    className="uizard-cta-primary mt-5 inline-block py-2.5 px-4 text-xs font-semibold"
-                  >
-                    SI 자동화 PoC 상담 요청
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* OTHER 4 DIVISIONS GRID */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* P: Plannershift */}
-              <div className="uizard-card p-6">
-                <div className="w-8 h-8 rounded-lg bg-[#18181b] border border-[#2e2e2e] text-white flex items-center justify-center font-bold font-mono mb-4">
-                  P
-                </div>
-                <h4 className="text-base font-bold text-white">Plannershift</h4>
-                <div className="text-xs text-[#a881fe] font-medium mb-2">스마트 여행 & 라이프 플래닝</div>
-                <p className="text-xs text-[#aeaeae] leading-relaxed">
-                  개인 맞춤형 일정과 기상, 로컬 동선을 계산하여 최적의 자율 일정표를 생성합니다.
-                </p>
-              </div>
-
-              {/* Y: Yieldshift */}
-              <div className="uizard-card p-6">
-                <div className="w-8 h-8 rounded-lg bg-[#18181b] border border-[#2e2e2e] text-emerald-400 flex items-center justify-center font-bold font-mono mb-4">
-                  Y
-                </div>
-                <h4 className="text-base font-bold text-white">Yieldshift</h4>
-                <div className="text-xs text-emerald-400 font-medium mb-2">주식·투자 퀀트 자동매매</div>
-                <p className="text-xs text-[#aeaeae] leading-relaxed">
-                  다중 지표 분석과 리스크 수칙을 적용한 알고리즘 기반 자동 포트폴리오 운용.
-                </p>
-              </div>
-
-              {/* H: Healshift */}
-              <div className="uizard-card p-6">
-                <div className="w-8 h-8 rounded-lg bg-[#18181b] border border-[#2e2e2e] text-rose-400 flex items-center justify-center font-bold font-mono mb-4">
-                  H
-                </div>
-                <h4 className="text-base font-bold text-white">Healshift</h4>
-                <div className="text-xs text-rose-400 font-medium mb-2">헬스케어 & 생체 데이터 지능</div>
-                <p className="text-xs text-[#aeaeae] leading-relaxed">
-                  웨어러블 및 건강검진 데이터를 기반으로 맞춤형 예방 건강 루틴을 제공합니다.
-                </p>
-              </div>
-
-              {/* O: Outreachshift */}
-              <div className="uizard-card p-6">
-                <div className="w-8 h-8 rounded-lg bg-[#18181b] border border-[#2e2e2e] text-[#ccb2ff] flex items-center justify-center font-bold font-mono mb-4">
-                  O
-                </div>
-                <h4 className="text-base font-bold text-white">Outreachshift</h4>
-                <div className="text-xs text-[#ccb2ff] font-medium mb-2">마케팅 & 지식 외부 선순환</div>
-                <p className="text-xs text-[#aeaeae] leading-relaxed">
-                  사내 KB의 통찰을 안전하게 콘텐츠화하여 독자 피드백을 다시 두뇌로 환류시킵니다.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 6. INFRASTRUCTURE & ARCHITECTURE */}
-      <section id="architecture" className="py-20 border-t border-[#2e2e2e]/70 relative">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <div className="text-xs font-mono text-[#a881fe] uppercase tracking-widest mb-3">Enterprise Tech Stack</div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-              사내 인프라 및 기술 아키텍처
-            </h2>
-            <p className="mt-4 text-[#aeaeae] text-sm sm:text-base leading-relaxed">
-              사내 프라이빗 서버(192.168.64.31)와 Nginx 게이트웨이, Cloudflare Zero Trust 보안 터널을 통한
-              엔터프라이즈급 24/7 무중단 운영 체계.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="uizard-card p-6">
-              <div className="p-2.5 rounded-xl bg-[#18181b] border border-[#2e2e2e] text-[#a881fe] w-fit mb-4">
-                <Server className="w-5 h-5" />
-              </div>
-              <h3 className="text-base font-bold text-white">서버 인프라 & 게이트웨이</h3>
-              <ul className="mt-4 space-y-2 text-xs text-[#aeaeae] font-mono">
-                <li>• 서버 IP: 192.168.64.31 (사내망/SSLVPN)</li>
-                <li>• Nginx 포트 80 웹 게이트웨이 바인딩</li>
-                <li>• Cloudflare Tunnel (포트 3001 ↔ SSL HTTPS)</li>
-                <li>• PostgreSQL 16 DB (포트 5432 연동)</li>
-              </ul>
-            </div>
-
-            <div className="uizard-card p-6">
-              <div className="p-2.5 rounded-xl bg-[#18181b] border border-[#2e2e2e] text-white w-fit mb-4">
-                <Network className="w-5 h-5" />
-              </div>
-              <h3 className="text-base font-bold text-white">N8N 자동화 신경망</h3>
-              <ul className="mt-4 space-y-2 text-xs text-[#aeaeae] font-mono">
-                <li>• 이벤트 트리거 & 액션 기반 파이프라인</li>
-                <li>• Slack / Telegram / 이메일 실시간 노티</li>
-                <li>• NAS Docker 기반 자율 워크플로우 구동</li>
-                <li>• 예외 상황 발생 시 7인 의회 자동 소집</li>
-              </ul>
-            </div>
-
-            <div className="uizard-card p-6">
-              <div className="p-2.5 rounded-xl bg-[#18181b] border border-[#2e2e2e] text-[#a881fe] w-fit mb-4">
-                <Code2 className="w-5 h-5" />
-              </div>
-              <h3 className="text-base font-bold text-white">모던 풀스택 & CI/CD</h3>
-              <ul className="mt-4 space-y-2 text-xs text-[#aeaeae] font-mono">
-                <li>• Next.js App Router (Uizard 스타일 시스템)</li>
-                <li>• GitHub Actions 자동 빌드 & 테스트</li>
-                <li>• 모바일 / 태블릿 / PC 100% 반응형</li>
-                <li>• Zod 기반 데이터 무결성 & XSS 방어</li>
-              </ul>
-            </div>
-          </div>
-
-          {/* AI-LLMCheck Architecture Tool Integration Card */}
-          <div className="mt-8 p-6 sm:p-8 rounded-2xl bg-[#14141d] border border-[#a881fe]/30 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden shadow-2xl">
-            <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[#a881fe]/15 text-[#a881fe] text-xs font-mono font-semibold">
-                ⭐ New Architecture Tool
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                AI-LLMCheck : 로컬 LLM VRAM 계산 & 하드웨어 진단 도구
-              </h3>
-              <p className="text-sm text-[#aeaeae] max-w-2xl leading-relaxed">
-                현재 접속 PC의 GPU(VRAM) 및 시스템 메모리를 실시간 진단하고, 102종 최신 LLM(Qwen 3, Llama 3.3, DeepSeek R1)의 최적 구동 가능 여부 및 파인튜닝 메모리를 정밀 시뮬레이션합니다.
-              </p>
-            </div>
-            <a
-              href="/tools/vram-calc/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-3.5 rounded-xl bg-[#a881fe] hover:bg-[#9063f2] text-black font-bold text-sm tracking-tight transition-all shrink-0 shadow-lg shadow-[#a881fe]/20 flex items-center gap-2 group"
-            >
-              <span>VRAM 진단기 실행하기</span>
-              <span className="group-hover:translate-x-1 transition-transform">→</span>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* 7. CONTACT US & CONSULTATION FORM */}
-      <section id="contact" className="py-20 border-t border-[#2e2e2e]/70 relative">
-        <div className="max-w-[800px] mx-auto px-6">
-          <div className="text-center mb-12">
-            <div className="text-xs font-mono text-[#a881fe] uppercase tracking-widest mb-3">Connect With The 7 Parks</div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-              에이전트 도입 및 프로젝트 상담
-            </h2>
-            <p className="mt-4 text-[#aeaeae] text-sm sm:text-base leading-relaxed">
-              귀사의 SI 과업, PMO 자동화, 지능형 에이전트 도입에 관해 문의를 남겨주시면
-              담당 에이전트가 검토 후 신속히 연락드립니다.
-            </p>
-            <div className="mt-4 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#18181b] border border-[#2e2e2e] text-xs text-[#aeaeae] font-mono">
-              <span>공식 직통 채널:</span>
-              <a href="mailto:pyhgoshift@pyhgoshift.com" className="font-semibold text-white underline hover:text-[#a881fe] transition-colors">
-                pyhgoshift@pyhgoshift.com
-              </a>
-            </div>
-          </div>
-
-          <div className="uizard-card p-8 sm:p-10">
-            {formStatus === "success" ? (
-              <div className="text-center py-12 space-y-4">
-                <div className="w-14 h-14 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto border border-emerald-500/40">
-                  <CheckCircle2 className="w-8 h-8" />
-                </div>
-                <h3 className="text-xl font-bold text-white">문의가 정상 접수되었습니다!</h3>
-                <p className="text-[#aeaeae] text-sm max-w-md mx-auto">{statusMessage}</p>
-                <button
-                  onClick={() => setFormStatus("idle")}
-                  className="uizard-btn-secondary mt-4 px-6 py-2.5 text-xs font-semibold"
-                >
-                  추가 문의 작성하기
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-xs font-medium text-[#aeaeae] mb-2">성함 / 직책 *</label>
-                    <input
-                      type="text"
-                      name="name"
-                      required
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      placeholder="예: 홍길동 팀장"
-                      className="w-full px-4 py-3 rounded-lg bg-[#0b0b0b] border border-[#2e2e2e] focus:border-[#a881fe] focus:outline-none text-white text-sm transition-colors"
-                    />
+                    <p className="text-xs text-slate-400 mt-1">
+                      모듈: `report_crew.py` ➔ WBS 공정률, 에이전트 투입 현황, 리스크 식별 내역을 분석하여 실시간 보고서를 편철합니다.
+                    </p>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-medium text-[#aeaeae] mb-2">이메일 주소 *</label>
-                    <input
-                      type="email"
-                      name="email"
-                      required
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      placeholder="contact@company.com"
-                      className="w-full px-4 py-3 rounded-lg bg-[#0b0b0b] border border-[#2e2e2e] focus:border-[#a881fe] focus:outline-none text-white text-sm transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-xs font-medium text-[#aeaeae] mb-2">소속 회사 / 기관명</label>
-                    <input
-                      type="text"
-                      name="company"
-                      value={formData.company}
-                      onChange={handleInputChange}
-                      placeholder="예: 아이티센 / 경기교육청 등"
-                      className="w-full px-4 py-3 rounded-lg bg-[#0b0b0b] border border-[#2e2e2e] focus:border-[#a881fe] focus:outline-none text-white text-sm transition-colors"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-[#aeaeae] mb-2">관심 분야 / 사업부</label>
+                  <div className="flex items-center gap-3">
                     <select
-                      name="division"
-                      value={formData.division}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 rounded-lg bg-[#0b0b0b] border border-[#2e2e2e] focus:border-[#a881fe] focus:outline-none text-white text-sm transition-colors"
+                      value={pmoWeek}
+                      onChange={(e) => setPmoWeek(e.target.value)}
+                      className="px-3 py-2 rounded-xl bg-[#161622] border border-white/10 text-xs font-mono text-white focus:outline-none focus:border-[#a881fe]"
                     >
-                      <option value="Growshift (SI / 업무자동화)">Growshift (SI / PMO 업무자동화)</option>
-                      <option value="AgentOps 플랫폼 구축">AgentOps 자율 플랫폼 도입</option>
-                      <option value="Plannershift (여행/일정)">Plannershift (라이프 플래닝)</option>
-                      <option value="Yieldshift (퀀트/투자)">Yieldshift (투자 알고리즘)</option>
-                      <option value="Healshift (헬스케어)">Healshift (생체 지능)</option>
-                      <option value="기타 제휴 및 문의">기타 사업 제휴 문의</option>
+                      <option value="2026-10-W3">2026년 10월 3주차 (현재)</option>
+                      <option value="2026-10-W2">2026년 10월 2주차 (완료)</option>
+                      <option value="2026-10-W1">2026년 10월 1주차 (완료)</option>
                     </select>
+
+                    <button
+                      onClick={handleGeneratePmo}
+                      disabled={pmoGenerating}
+                      className="uizard-cta-primary px-4 py-2 text-xs font-bold flex items-center gap-1.5 disabled:opacity-50"
+                    >
+                      <RotateCw className={`w-3.5 h-3.5 ${pmoGenerating ? "animate-spin" : ""}`} />
+                      <span>{pmoGenerating ? "CrewAI 분석 중..." : "주간 보고서 즉시 생성"}</span>
+                    </button>
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-medium text-[#aeaeae] mb-2">문의 상세 내용 *</label>
-                  <textarea
-                    name="message"
-                    required
-                    rows={4}
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    placeholder="프로젝트 개요, 도입 희망 영역, 일정 등을 자유롭게 기술해 주세요."
-                    className="w-full px-4 py-3 rounded-lg bg-[#0b0b0b] border border-[#2e2e2e] focus:border-[#a881fe] focus:outline-none text-white text-sm resize-none transition-colors"
-                  ></textarea>
-                </div>
+                {/* Report Viewer Card */}
+                {pmoGenerated && (
+                  <div className="bg-[#12121a] rounded-2xl border border-white/10 p-6 space-y-6">
+                    <div className="flex items-center justify-between border-b border-white/[0.06] pb-4">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold border border-emerald-500/30">
+                          STATUS: 정상 승인 (VERIFIED)
+                        </span>
+                        <span className="text-xs text-slate-400 font-mono">
+                          문서 번호: PYHGO-PMO-{pmoWeek}-FINAL
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setCopiedReport(true);
+                          setTimeout(() => setCopiedReport(false), 2000);
+                        }}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-medium text-slate-300 transition-colors"
+                      >
+                        {copiedReport ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>{copiedReport ? "복사 완료!" : "마크다운 복사"}</span>
+                      </button>
+                    </div>
 
-                {formStatus === "error" && (
-                  <div className="p-3 rounded-lg bg-rose-950/40 border border-rose-500/40 text-xs text-rose-300">
-                    {statusMessage}
+                    {/* Report Executive Summary Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                        <span className="text-xs text-slate-400">SI 업무자동화 공정률</span>
+                        <div className="text-2xl font-mono font-extrabold text-emerald-400 mt-1">94.8%</div>
+                        <div className="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
+                          <div className="bg-emerald-400 h-full w-[94.8%]"></div>
+                        </div>
+                      </div>
+
+                      <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                        <span className="text-xs text-slate-400">사내 에이전트 포털 통합</span>
+                        <div className="text-2xl font-mono font-extrabold text-[#a881fe] mt-1">98.2%</div>
+                        <div className="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
+                          <div className="bg-[#a881fe] h-full w-[98.2%]"></div>
+                        </div>
+                      </div>
+
+                      <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                        <span className="text-xs text-slate-400">Zod 보안 감사 합격률</span>
+                        <div className="text-2xl font-mono font-extrabold text-cyan-400 mt-1">100.0%</div>
+                        <div className="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
+                          <div className="bg-cyan-400 h-full w-[100%]"></div>
+                        </div>
+                      </div>
+
+                      <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                        <span className="text-xs text-slate-400">활성 에이전트 인력</span>
+                        <div className="text-2xl font-mono font-extrabold text-white mt-1">7 / 7 Parks</div>
+                        <div className="text-[11px] text-emerald-400 mt-1">전원 무결격 작전 중</div>
+                      </div>
+                    </div>
+
+                    {/* Detailed Content */}
+                    <div className="space-y-4 text-xs sm:text-sm text-slate-300 font-sans leading-relaxed bg-[#0a0a10] p-5 rounded-xl border border-white/5">
+                      <h4 className="font-bold text-white text-sm border-b border-white/10 pb-2 flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        <span>[주요 달성 과업 및 에이전트별 활동 내역]</span>
+                      </h4>
+                      <ul className="space-y-2 text-xs text-slate-300">
+                        <li>• <strong>파일럿 박 (CPO)</strong>: 통합 포털 아키텍처 청사진(`integrated_portal_blueprint.md`) 수립 및 5대 핵심 기능 매핑 완료.</li>
+                        <li>• <strong>이노베이터 박 (CTO)</strong>: Next.js 16.4.0 Standalone 도커 빌드 파이프라인 무결성 확보 및 상단 한 줄 네비게이션 적용.</li>
+                        <li>• <strong>고든 박 (CSO)</strong>: 사내 개발서버(`192.168.64.31`) 레거시 도커 캐시 3.5GB 프룬 및 미사용 잔여 폴더 아카이빙 격리 조치.</li>
+                        <li>• <strong>시냅스 박 (COO)</strong>: 텔레그램 회사서버봇(@ItcenServerbot) 및 슬랙 AI-PMO 웹소켓 세션 헬스체크 100% 정상 통과.</li>
+                      </ul>
+                    </div>
                   </div>
                 )}
+              </div>
+            )}
 
-                <button
-                  type="submit"
-                  disabled={formStatus === "loading"}
-                  className="uizard-cta-primary w-full py-3.5 text-sm flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {formStatus === "loading" ? (
-                    <span>전송 중...</span>
-                  ) : (
-                    <>
-                      <span>문의 전송하기</span>
-                      <Send className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
-              </form>
+            {/* TAB 2: 프로젝트 자동 셋업 웹 폼 */}
+            {activePortalTab === "setup" && (
+              <div className="p-6 sm:p-8 space-y-6 animate-fadeIn">
+                <div className="pb-6 border-b border-white/[0.06]">
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <FolderGit2 className="w-5 h-5 text-cyan-400" />
+                    <span>안드레 카파시 규격 프로젝트 자동 셋업 웹 콘솔</span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    모듈: `setup_project.py` ➔ 터미널 작업 없이 웹에서 프로젝트명과 스택을 입력하면 `CLAUDE.md`, `AGENTS.md`, Git 레포가 자동 생성됩니다.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Form */}
+                  <div className="space-y-4 bg-[#12121c] p-6 rounded-2xl border border-white/10">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                        프로젝트 명칭 (Identifier)
+                      </label>
+                      <input
+                        type="text"
+                        value={setupProjectName}
+                        onChange={(e) => setSetupProjectName(e.target.value)}
+                        className="w-full px-4 py-2.5 rounded-xl bg-[#181824] border border-white/10 text-xs sm:text-sm text-white font-mono focus:outline-none focus:border-cyan-400"
+                        placeholder="예: itcen-agentops-core"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                        전담 리드 에이전트 (The 7 Parks)
+                      </label>
+                      <select
+                        value={setupPersona}
+                        onChange={(e) => setSetupPersona(e.target.value)}
+                        className="w-full px-4 py-2.5 rounded-xl bg-[#181824] border border-white/10 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
+                      >
+                        <option value="이노베이터 박 [CTO / 혁신]">이노베이터 박 [CTO / 프론트엔드 & 아키텍처]</option>
+                        <option value="파일럿 박 [CPO / 항해사]">파일럿 박 [CPO / 로드맵 & 기획]</option>
+                        <option value="고든 박 [CSO / 수호자]">고든 박 [CSO / 보안 & 가드레일]</option>
+                        <option value="시냅스 박 [COO / 연결자]">시냅스 박 [COO / API 연동 & DB]</option>
+                        <option value="프롬프트 박 [CAO / 설계자]">프롬프트 박 [CAO / 프롬프트 & 헌장]</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                        기본 기술 스택 (Tech Stacks)
+                      </label>
+                      <select
+                        value={setupStack}
+                        onChange={(e) => setSetupStack(e.target.value)}
+                        className="w-full px-4 py-2.5 rounded-xl bg-[#181824] border border-white/10 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
+                      >
+                        <option value="Next.js 16 + FastAPI + PostgreSQL 16">Next.js 16 + FastAPI + PostgreSQL 16</option>
+                        <option value="CrewAI + LangChain + Python 3.12">CrewAI + LangChain + Python 3.12</option>
+                        <option value="Qdrant RAG + FastEmbed + Node 20">Qdrant RAG + FastEmbed + Node 20</option>
+                      </select>
+                    </div>
+
+                    <button
+                      onClick={handleRunSetup}
+                      disabled={setupRunning}
+                      className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-[#09090e] font-bold text-xs sm:text-sm transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      <Play className={`w-4 h-4 ${setupRunning ? "animate-spin" : ""}`} />
+                      <span>{setupRunning ? "프로젝트 자동 생성 중..." : "원클릭 프로젝트 자동 셋업 실행"}</span>
+                    </button>
+                  </div>
+
+                  {/* Realtime Terminal Console Output */}
+                  <div className="bg-[#0b0b12] p-5 rounded-2xl border border-white/10 font-mono text-xs flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3 text-slate-400">
+                        <span className="flex items-center gap-1.5 text-cyan-400 font-bold">
+                          <Terminal className="w-3.5 h-3.5" />
+                          <span>setup_project.py Console Log</span>
+                        </span>
+                        <span className="text-[10px] bg-white/5 px-2 py-0.5 rounded">Karpathy Protocol</span>
+                      </div>
+
+                      <div className="space-y-2 text-slate-300 leading-relaxed overflow-y-auto max-h-56">
+                        {setupLogs.map((log, idx) => (
+                          <div key={idx} className="flex items-start gap-2">
+                            <span className="text-cyan-400 select-none">&gt;</span>
+                            <span className={log.includes("완료") ? "text-emerald-400 font-semibold" : "text-slate-300"}>
+                              {log}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
+                      <span>대상 서버: 192.168.64.31</span>
+                      <span className="text-emerald-400 flex items-center gap-1">
+                        <Check className="w-3 h-3" />
+                        <span>Ready for Auto-Deploy</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 3: 듀얼 챗옵스 통합 관제 패널 */}
+            {activePortalTab === "chatops" && (
+              <div className="p-6 sm:p-8 space-y-6 animate-fadeIn">
+                <div className="pb-6 border-b border-white/[0.06]">
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <Radio className="w-5 h-5 text-emerald-400" />
+                    <span>사내 듀얼 챗옵스 (Slack & Telegram) 실시간 통합 관제 패널</span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    신규 사내 개발 서버(`192.168.64.31`)에 연동된 슬랙 AI-PMO 봇과 텔레그램 회사서버봇의 연결성 및 하트비트를 실시간 모니터링합니다.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Slack Bot Status */}
+                  <div className="p-6 rounded-2xl bg-[#12121c] border border-white/10 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-3 h-3 rounded-full bg-emerald-400 animate-ping"></div>
+                        <span className="font-bold text-sm text-white">슬랙 봇: AI-PMO</span>
+                      </div>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        ACTIVE 🟢
+                      </span>
+                    </div>
+
+                    <div className="space-y-2 text-xs font-mono text-slate-300 bg-[#0c0c14] p-4 rounded-xl border border-white/5">
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">네트워크 소켓:</span>
+                        <span className="text-emerald-400">WebSocket / RTM 연결됨</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">응답 레이턴시:</span>
+                        <span className="text-white">12 ms</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">월간 가동률:</span>
+                        <span className="text-white">99.98%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">최근 트리거 명령:</span>
+                        <span className="text-cyan-300">/pmo report generate 2026-10-W3</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Telegram Serverbot Status */}
+                  <div className="p-6 rounded-2xl bg-[#12121c] border border-white/10 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-3 h-3 rounded-full bg-emerald-400 animate-ping"></div>
+                        <span className="font-bold text-sm text-white">텔레그램 봇: 회사서버봇 (@ItcenServerbot)</span>
+                      </div>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        ACTIVE 🟢
+                      </span>
+                    </div>
+
+                    <div className="space-y-2 text-xs font-mono text-slate-300 bg-[#0c0c14] p-4 rounded-xl border border-white/5">
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">적용 호스트:</span>
+                        <span className="text-emerald-400">192.168.64.31 (사내 개발 서버)</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">실행 경로:</span>
+                        <span className="text-white">/home/devadm01/itcen-claude-telChatOps</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">SSH 세션 연동:</span>
+                        <span className="text-white">포트 7722 정상 승인</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">최근 실행 상태:</span>
+                        <span className="text-cyan-300">Docker & Next.js 무결성 100% 감시 중</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 4: Claude + Codex 교차 검증 모니터링 */}
+            {activePortalTab === "review" && (
+              <div className="p-6 sm:p-8 space-y-6 animate-fadeIn">
+                <div className="pb-6 border-b border-white/[0.06]">
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <Shield className="w-5 h-5 text-violet-400" />
+                    <span>Claude + Codex 듀얼 엔진 교차 검증 & Self-Healing 관제</span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    주엔진(Claude)의 소스코드 및 문서 생산 결과물을 검수관(Codex)이 독립 검증하여 불일치 시 자율 회복을 수행합니다.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="p-5 rounded-2xl bg-[#12121c] border border-white/10 space-y-2">
+                    <span className="text-xs text-slate-400">교차 검증 성공률</span>
+                    <div className="text-3xl font-mono font-extrabold text-[#a881fe]">99.8%</div>
+                    <p className="text-[11px] text-slate-400">총 428회 빌드 중 427회 무결성 승인 통과</p>
+                  </div>
+
+                  <div className="p-5 rounded-2xl bg-[#12121c] border border-white/10 space-y-2">
+                    <span className="text-xs text-slate-400">Self-Healing 자율 복구</span>
+                    <div className="text-3xl font-mono font-extrabold text-cyan-400">14 건</div>
+                    <p className="text-[11px] text-slate-400">인간 개입 0회로 포트/캐시 충돌 자동 치유</p>
+                  </div>
+
+                  <div className="p-5 rounded-2xl bg-[#12121c] border border-white/10 space-y-2">
+                    <span className="text-xs text-slate-400">5대 자율 트리거 상태</span>
+                    <div className="text-3xl font-mono font-extrabold text-emerald-400">ALL GREEN</div>
+                    <p className="text-[11px] text-slate-400">Git Push, 로그 감시, 크론 정상 작동</p>
+                  </div>
+                </div>
+
+                <div className="bg-[#0b0b12] p-5 rounded-2xl border border-white/10 space-y-3">
+                  <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <Activity className="w-3.5 h-3.5 text-[#a881fe]" />
+                    <span>최근 자율 회복(Self-Healing) 실행 로그 타임라인</span>
+                  </h4>
+                  <div className="space-y-2 text-xs font-mono text-slate-300">
+                    <div className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.02]">
+                      <span className="text-slate-400">14:28:10</span>
+                      <span className="text-amber-300">포트 3001 프로세스 충돌 감지</span>
+                      <span className="text-emerald-400">➔ Docker 오케스트레이션 자동 리셋 완료 (인간 개입 0%)</span>
+                    </div>
+                    <div className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.02]">
+                      <span className="text-slate-400">13:56:45</span>
+                      <span className="text-amber-300">Turbopack 미추적 파일 빌드 간섭 감지</span>
+                      <span className="text-emerald-400">➔ 레거시 아카이빙 격리 및 Standalone 빌드 통과 (자율 치유)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 5: RAG 지식 & 산출물 검색 */}
+            {activePortalTab === "rag" && (
+              <div className="p-6 sm:p-8 space-y-6 animate-fadeIn">
+                <div className="pb-6 border-b border-white/[0.06]">
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <Search className="w-5 h-5 text-pink-400" />
+                    <span>PostgreSQL 16 & Qdrant 벡터 RAG 사내 지식 검색기</span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    프로젝트 산출물, 규정 가이드, 에이전트 작업 이력을 시맨틱 임베딩 벡터로 고속 검색합니다.
+                  </p>
+                </div>
+
+                {/* Search Bar */}
+                <form onSubmit={handleRagSearch} className="flex gap-3">
+                  <div className="relative flex-1">
+                    <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={ragQuery}
+                      onChange={(e) => setRagQuery(e.target.value)}
+                      placeholder="사내 산출물 또는 에이전트 지식 검색 (예: 카파시 규격, PMO 주간 보고서, Zod 보안)..."
+                      className="w-full pl-11 pr-4 py-3 rounded-xl bg-[#141420] border border-white/10 text-xs sm:text-sm text-white focus:outline-none focus:border-pink-500"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="px-6 py-3 rounded-xl bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs sm:text-sm transition-all shadow-lg shadow-pink-600/30 flex items-center gap-2"
+                  >
+                    <span>{ragSearching ? "검색 중..." : "벡터 검색"}</span>
+                  </button>
+                </form>
+
+                {/* Results List */}
+                <div className="space-y-3">
+                  {ragResults.map((item, index) => (
+                    <div
+                      key={index}
+                      className="p-5 rounded-2xl bg-[#12121c] border border-white/10 hover:border-pink-500/40 transition-all cursor-pointer group"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-bold text-[#ccb2ff] bg-[#a881fe]/15 px-2.5 py-0.5 rounded-full border border-[#a881fe]/30">
+                          {item.category}
+                        </span>
+                        <span className="text-xs font-mono font-bold text-emerald-400">
+                          유사도: {item.score}
+                        </span>
+                      </div>
+                      <h4 className="text-sm font-bold text-white group-hover:text-pink-300 transition-colors">
+                        {item.title}
+                      </h4>
+                      <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                        {item.summary}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         </div>
       </section>
 
-      {/* 8. FOOTER */}
-      <footer className="border-t border-[#2e2e2e]/70 bg-[#0b0b0b] py-12 text-[#aeaeae] text-xs">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-[#a881fe]/40 bg-[#141414] shadow-[0_0_12px_rgba(168,129,254,0.2)] flex items-center justify-center p-0.5">
-                  <Image
-                    src="/images/pyhgoshift_symbol.png"
-                    alt="PYHGOSHIFT Logo"
-                    width={40}
-                    height={40}
-                    className="object-contain w-full h-full"
-                  />
-                </div>
-                <span className="font-bold text-white text-base tracking-tight">PYHGOSHIFT</span>
+      {/* =========================================================================
+          4. PHILOSOPHY SECTION (자아 훼방과 혁신)
+      ========================================================================= */}
+      <section id="philosophy" className="py-24 max-w-[1200px] mx-auto px-6">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#181822] border border-[#2e2e2e] text-xs text-[#a881fe] mb-3 font-mono">
+            <span>CORE PHILOSOPHY</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            의도적인 자아 훼방 (Ego Disruption)
+          </h2>
+          <p className="text-sm text-[#aeaeae] mt-3 leading-relaxed">
+            기존의 고정관념과 조직적 관습은 시야를 가로막습니다. 파이고시프트는 규칙 안에서 자아를 해체하고 재구성하여, 보이지 않던 거대한 가치를 실현합니다.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="refero-glass-card p-8 space-y-4">
+            <div className="w-12 h-12 rounded-xl bg-[#a881fe]/10 border border-[#a881fe]/30 flex items-center justify-center text-[#a881fe]">
+              <Brain className="w-6 h-6" />
+            </div>
+            <h3 className="text-xl font-bold text-white">1. 자아의 해체</h3>
+            <p className="text-xs sm:text-sm text-[#aeaeae] leading-relaxed">
+              &quot;내가 옳다&quot;는 확증 편향을 과감히 부수고, 데이터와 엄격한 다중 에이전트 교차 검증만을 진실로 채택합니다.
+            </p>
+          </div>
+
+          <div className="refero-glass-card p-8 space-y-4">
+            <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+              <Zap className="w-6 h-6" />
+            </div>
+            <h3 className="text-xl font-bold text-white">2. 플로우 상태 (Flow)</h3>
+            <p className="text-xs sm:text-sm text-[#aeaeae] leading-relaxed">
+              의심과 불안을 걷어내고 온전히 작업 자체와 일체화되는 바이브 코딩(Vibe Coding)의 극한 몰입 상태를 지향합니다.
+            </p>
+          </div>
+
+          <div className="refero-glass-card p-8 space-y-4">
+            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+              <Sparkles className="w-6 h-6" />
+            </div>
+            <h3 className="text-xl font-bold text-white">3. 보이지 않던 가치</h3>
+            <p className="text-xs sm:text-sm text-[#aeaeae] leading-relaxed">
+              단순 반복적인 개발 노동에서 벗어나, 에이전트 연쇄 자율 구동을 통해 기업 가치를 지수함수적으로 팽창시킵니다.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          5. THE 7 PARKS (더 세븐 박 집단지성)
+      ========================================================================= */}
+      <section id="council" className="py-24 bg-[#0a0a0f] border-t border-white/[0.08]">
+        <div className="max-w-[1240px] mx-auto px-6">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#a881fe]/15 border border-[#a881fe]/30 text-xs font-mono text-[#ccb2ff] mb-3">
+              <span>EXECUTIVE AGENT COUNCIL</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+              더 세븐 박 (The 7 Parks) 시스템
+            </h2>
+            <p className="text-sm text-[#aeaeae] mt-2">
+              상황과 과업의 성격에 따라 동적으로 역할을 전환하며 자율 의결하는 7인의 핵심 페르소나입니다.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="refero-glass-card p-6 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-[#a881fe]">PARK #0</span>
+                <span className="px-2 py-0.5 rounded bg-[#a881fe]/20 text-[#ccb2ff] text-[10px] font-mono">CEO</span>
               </div>
-              <p className="text-[#aeaeae] text-[11px] leading-relaxed">
-                자아를 훼방시켜, 규칙 안 숨겨진 가치를 발굴·극대화한다.<br />
-                인간의 개입을 0으로 만드는 AgentOps 플랫폼
+              <h3 className="text-lg font-bold text-white">프로이트 박 [욕망 분석]</h3>
+              <p className="text-xs text-[#aeaeae] leading-relaxed">
+                사용자의 의도가 모호하거나 방향이 흔들릴 때 무의식적 본질을 짚어내고 전략적 방향을 제시합니다.
               </p>
             </div>
 
-            <div>
-              <div className="text-white font-semibold mb-3">회사 정보</div>
-              <ul className="space-y-1.5 text-[11px]">
-                <li>사명: 파이고시프트 (PYHGOSHIFT)</li>
-                <li>창업자: 박용희 (Park Yong-Hee)</li>
-                <li>도메인: www.pyhgoshift.com</li>
-                <li>이메일: pyhgoshift@pyhgoshift.com</li>
-              </ul>
+            <div className="refero-glass-card p-6 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-cyan-400">PARK #1</span>
+                <span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 text-[10px] font-mono">CPO</span>
+              </div>
+              <h3 className="text-lg font-bold text-white">파일럿 박 [항해사]</h3>
+              <p className="text-xs text-[#aeaeae] leading-relaxed">
+                전체 프로젝트의 로드맵, 파일 구조, 라우팅 및 WBS 공정을 총괄 항해합니다.
+              </p>
             </div>
 
-            <div>
-              <div className="text-white font-semibold mb-3">주요 사업부</div>
-              <ul className="space-y-1.5 text-[11px]">
-                <li>• Growshift (SI / PMO 자동화)</li>
-                <li>• Plannershift (여행 플래닝)</li>
-                <li>• Yieldshift (퀀트 알고리즘)</li>
-                <li>• Healshift (생체 지능 케어)</li>
-                <li>• Outreachshift (지식 외부 순환)</li>
-              </ul>
+            <div className="refero-glass-card p-6 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-emerald-400">PARK #2</span>
+                <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono">CTO</span>
+              </div>
+              <h3 className="text-lg font-bold text-white">이노베이터 박 [혁신가]</h3>
+              <p className="text-xs text-[#aeaeae] leading-relaxed">
+                Next.js 16, 모던 UI/UX, 고속 빌드 파이프라인 및 프론트엔드 최적화 코딩을 주도합니다.
+              </p>
             </div>
 
-            <div>
-              <div className="text-white font-semibold mb-3">인프라 & 보안</div>
-              <ul className="space-y-1.5 text-[11px]">
-                <li>• 서버: 192.168.64.31 (Port 3001)</li>
-                <li>• Nginx Gateway & Cloudflare Tunnel</li>
-                <li>• PostgreSQL 16 (Port 5432)</li>
-                <li>• Karpathy 5계층 지식 분류 아키텍처</li>
-              </ul>
+            <div className="refero-glass-card p-6 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-rose-400">PARK #3</span>
+                <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 text-[10px] font-mono">CSO</span>
+              </div>
+              <h3 className="text-lg font-bold text-white">고든 박 [수호자]</h3>
+              <p className="text-xs text-[#aeaeae] leading-relaxed">
+                Zod 런타임 보안 스키마, 토큰/키 마스킹, 권한 검증 및 에러 서킷 브레이커를 엄격히 통제합니다.
+              </p>
+            </div>
+
+            <div className="refero-glass-card p-6 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-amber-400">PARK #4</span>
+                <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-mono">COO</span>
+              </div>
+              <h3 className="text-lg font-bold text-white">시냅스 박 [연결자]</h3>
+              <p className="text-xs text-[#aeaeae] leading-relaxed">
+                FastAPI, 슬랙/텔레그램 챗옵스 웹소켓, PostgreSQL 16 및 Qdrant 데이터 흐름을 직결합니다.
+              </p>
+            </div>
+
+            <div className="refero-glass-card p-6 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-purple-400">PARK #5</span>
+                <span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] font-mono">CAO</span>
+              </div>
+              <h3 className="text-lg font-bold text-white">프롬프트 박 [설계자]</h3>
+              <p className="text-xs text-[#aeaeae] leading-relaxed">
+                Karpathy 규격 프로젝트 헌장(CLAUDE.md), 시스템 프롬프트 및 LLM 가드레일을 정밀 설계합니다.
+              </p>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div className="pt-8 border-t border-[#2e2e2e]/50 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px]">
-            <div>© 2025-2026 PYHGOSHIFT Inc. All rights reserved.</div>
-            <div className="flex items-center gap-4 text-[#aeaeae]">
-              <span>개인정보처리방침</span>
-              <span>이용약관</span>
-              <span>보안수칙</span>
+      {/* =========================================================================
+          6. 5대 사업부 (P-Y-H-G-O)
+      ========================================================================= */}
+      <section id="divisions" className="py-24 max-w-[1240px] mx-auto px-6">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#181822] border border-[#2e2e2e] text-xs text-[#a881fe] mb-3 font-mono">
+            <span>BUSINESS STRATEGY</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            5대 전략 사업부 (P-Y-H-G-O)
+          </h2>
+          <p className="text-sm text-[#aeaeae] mt-2">
+            파이고시프트의 영문 약칭에 기반한 5대 핵심 비즈니스 포트폴리오입니다.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="refero-glass-card p-6 text-center space-y-3">
+            <span className="text-3xl font-extrabold text-[#a881fe]">P</span>
+            <h4 className="font-bold text-white text-sm">Platform</h4>
+            <p className="text-xs text-[#aeaeae]">AgentOps 자율 구동 사내 인프라 및 엔진 구축</p>
+          </div>
+
+          <div className="refero-glass-card p-6 text-center space-y-3">
+            <span className="text-3xl font-extrabold text-cyan-400">Y</span>
+            <h4 className="font-bold text-white text-sm">Yield</h4>
+            <p className="text-xs text-[#aeaeae]">인력 투입 대비 산출물 극대화 및 지표 관리</p>
+          </div>
+
+          <div className="refero-glass-card p-6 text-center space-y-3">
+            <span className="text-3xl font-extrabold text-emerald-400">H</span>
+            <h4 className="font-bold text-white text-sm">Humanless</h4>
+            <p className="text-xs text-[#aeaeae]">인간 개입 0%를 지향하는 전자동 프로세스화</p>
+          </div>
+
+          <div className="refero-glass-card p-6 text-center space-y-3">
+            <span className="text-3xl font-extrabold text-amber-400">G</span>
+            <h4 className="font-bold text-white text-sm">Growshift</h4>
+            <p className="text-xs text-[#aeaeae]">SI 프로젝트 라이프사이클 및 업무자동화 사업</p>
+          </div>
+
+          <div className="refero-glass-card p-6 text-center space-y-3">
+            <span className="text-3xl font-extrabold text-pink-400">O</span>
+            <h4 className="font-bold text-white text-sm">Optimization</h4>
+            <p className="text-xs text-[#aeaeae]">하드웨어 VRAM 및 LLM 양자화 자원 최적화</p>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          7. CONTACT SECTION (도입 문의)
+      ========================================================================= */}
+      <section id="contact" className="py-24 bg-[#09090e] border-t border-white/[0.08]">
+        <div className="max-w-[800px] mx-auto px-6">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#a881fe]/15 border border-[#a881fe]/30 text-xs font-mono text-[#ccb2ff] mb-3">
+              <span>GET IN TOUCH</span>
             </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+              디지털 노동력 도입 및 기술 상담
+            </h2>
+            <p className="text-sm text-[#aeaeae] mt-2">
+              파이고시프트의 AgentOps 플랫폼 도입이나 SI 자동화 컨설팅이 필요하시면 연락처를 남겨주십시오.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="refero-glass-card p-8 space-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">성함 / 직급</label>
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="예: 홍길동 수석"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#141420] border border-white/10 text-xs sm:text-sm text-white focus:outline-none focus:border-[#a881fe]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">이메일 주소</label>
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="name@company.com"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#141420] border border-white/10 text-xs sm:text-sm text-white focus:outline-none focus:border-[#a881fe]"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">회사명 / 부서명</label>
+                <input
+                  type="text"
+                  name="company"
+                  value={formData.company}
+                  onChange={handleInputChange}
+                  placeholder="예: 아이티센 PMO팀"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#141420] border border-white/10 text-xs sm:text-sm text-white focus:outline-none focus:border-[#a881fe]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">관심 사업부</label>
+                <select
+                  name="division"
+                  value={formData.division}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#141420] border border-white/10 text-xs sm:text-sm text-white focus:outline-none focus:border-[#a881fe]"
+                >
+                  <option value="Growshift (SI / 업무자동화)">Growshift (SI / 업무자동화)</option>
+                  <option value="Platform (사내 AgentOps 구축)">Platform (사내 AgentOps 구축)</option>
+                  <option value="Optimization (LLM VRAM 최적화)">Optimization (LLM VRAM 최적화)</option>
+                  <option value="The 7 Parks 에이전트 도입">The 7 Parks 에이전트 도입</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">문의 내용</label>
+              <textarea
+                name="message"
+                required
+                rows={4}
+                value={formData.message}
+                onChange={handleInputChange}
+                placeholder="도입을 검토 중인 과업이나 해결하고자 하는 기술적 병목을 남겨주시면 담당 에이전트가 검토합니다."
+                className="w-full px-4 py-2.5 rounded-xl bg-[#141420] border border-white/10 text-xs sm:text-sm text-white focus:outline-none focus:border-[#a881fe]"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={formStatus === "loading"}
+              className="w-full uizard-cta-primary py-3.5 text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-xl disabled:opacity-50"
+            >
+              <Send className="w-4 h-4" />
+              <span>{formStatus === "loading" ? "전송 중..." : "도입 상담 접수하기"}</span>
+            </button>
+
+            {formStatus === "success" && (
+              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs text-center">
+                {statusMessage}
+              </div>
+            )}
+
+            {formStatus === "error" && (
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs text-center">
+                {statusMessage}
+              </div>
+            )}
+          </form>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          8. FOOTER
+      ========================================================================= */}
+      <footer className="py-12 border-t border-white/[0.08] bg-[#07070a] text-xs text-[#80808a]">
+        <div className="max-w-[1240px] mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="font-extrabold text-white">PYHGOSHIFT</span>
+            <span>|</span>
+            <span>디지털 노동력 AgentOps 플랫폼</span>
+          </div>
+          <div className="flex items-center gap-4 text-[11px] font-mono">
+            <span>Host: 192.168.64.31</span>
+            <span>Docker: 3001:3000</span>
+            <span>Cloudflare Tunnel Verified</span>
           </div>
         </div>
       </footer>
