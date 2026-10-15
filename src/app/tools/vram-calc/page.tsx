@@ -13,22 +13,21 @@ export default function VramCalcPage() {
   return (
     <div className="w-full min-h-screen bg-[#0a0a0f] flex flex-col text-white">
       {/* 1. 상단 글로벌 네비게이션 바 (메인 홈페이지 복귀 헤더) */}
-      <header className="sticky top-0 z-50 h-16 bg-[#0b0b12]/95 border-b border-white/10 backdrop-blur-xl px-4 sm:px-6 flex items-center justify-between shadow-2xl">
+      <header className="sticky top-0 z-50 h-16 bg-[#0e0e11]/95 border-b border-[#27272a] backdrop-blur-xl px-4 sm:px-6 flex items-center justify-between shadow-2xl">
         {/* 좌측: 홈으로 돌아가기 버튼 & 로고 */}
         <div className="flex items-center gap-3 sm:gap-4">
           <Link
             href="/"
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.05] hover:bg-[#a881fe]/20 border border-white/10 hover:border-[#a881fe]/50 text-xs sm:text-sm font-semibold text-slate-200 hover:text-white transition-all shadow-sm group"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#18181b] hover:bg-[#00d992]/10 border border-[#27272a] hover:border-[#00d992]/50 text-xs sm:text-sm font-semibold text-zinc-300 hover:text-[#00d992] transition-all shadow-sm group"
           >
-            <ArrowLeft className="w-4 h-4 text-[#a881fe] group-hover:-translate-x-0.5 transition-transform" />
-            <span className="hidden xs:inline">홈으로</span>
-            <span>돌아가기</span>
+            <ArrowLeft className="w-4 h-4 text-[#00d992] group-hover:-translate-x-0.5 transition-transform" />
+            <span className="font-mono">← 메인 홈으로</span>
           </Link>
 
-          <div className="h-5 w-[1px] bg-white/10 hidden sm:block" />
+          <div className="h-5 w-[1px] bg-[#27272a] hidden sm:block" />
 
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg overflow-hidden border border-[#a881fe]/40 bg-[#121218] p-0.5">
+            <div className="w-8 h-8 rounded-lg overflow-hidden border border-[#00d992]/40 bg-[#121216] p-0.5">
               <Image
                 src="/images/pyhgoshift_symbol.png"
                 alt="PYHGOSHIFT Logo"
@@ -38,11 +37,11 @@ export default function VramCalcPage() {
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-sm tracking-tight text-white flex items-center gap-1.5">
+              <span className="font-bold text-sm tracking-tight text-white flex items-center gap-1.5 font-mono">
                 PYHGOSHIFT
-                <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-[#a881fe]/20 text-[#ccb2ff]">Portal</span>
+                <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-[#00d992]/10 text-[#00d992] border border-[#00d992]/30">Portal</span>
               </span>
-              <span className="text-[9px] text-slate-400 font-mono tracking-widest hidden md:block">
+              <span className="text-[9px] text-zinc-500 font-mono tracking-widest hidden md:block">
                 Digital Workforce Platform
               </span>
             </div>
@@ -50,30 +49,37 @@ export default function VramCalcPage() {
         </div>
 
         {/* 중앙: 도구 명칭 및 뱃지 */}
-        <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-violet-950/40 border border-violet-500/30 text-xs font-medium text-violet-300">
-          <Cpu className="w-3.5 h-3.5 text-violet-400" />
+        <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-[#18181b] border border-[#27272a] text-xs font-mono text-zinc-300">
+          <Cpu className="w-3.5 h-3.5 text-[#00d992]" />
           <span>AI-LLMCheck: 온프레미스 LLM & VRAM 하드웨어 계산기</span>
         </div>
 
         {/* 우측: 메뉴 링크들 */}
         <div className="flex items-center gap-2 sm:gap-3">
           <Link
+            href="/#portal"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono text-zinc-300 hover:text-[#00d992] hover:bg-[#18181b] transition-colors"
+          >
+            <span>에이전트 포털</span>
+          </Link>
+
+          <Link
             href="/#council"
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono text-zinc-300 hover:text-[#00d992] hover:bg-[#18181b] transition-colors"
           >
             <span>더 세븐 박</span>
           </Link>
 
           <Link
             href="/#divisions"
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono text-zinc-300 hover:text-[#00d992] hover:bg-[#18181b] transition-colors"
           >
             <span>5대 사업부</span>
           </Link>
 
           <Link
             href="/#contact"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#a881fe] hover:bg-[#9266fc] text-[#0b0b12] text-xs font-bold transition-all shadow-[0_0_15px_rgba(168,129,254,0.4)]"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00d992] hover:bg-[#00c584] text-[#0e0e11] text-xs font-mono font-bold transition-all shadow-[0_0_15px_rgba(0,217,146,0.2)]"
           >
             <MessageSquare className="w-3.5 h-3.5" />
             <span>도입 문의</span>
