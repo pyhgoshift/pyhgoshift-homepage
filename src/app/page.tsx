@@ -71,48 +71,59 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0b0b] text-[#f5f5f5] selection:bg-[#a881fe] selection:text-[#0b0b0b]">
-      {/* 1. TOP NAVBAR */}
-      <header className="sticky top-0 z-50 border-b border-[#2e2e2e]/70 bg-[#0b0b0b]/90 backdrop-blur-xl">
-        <div className="max-w-[1200px] mx-auto px-6 h-18 flex items-center justify-between">
+    <div className="min-h-screen refero-bg-grid text-[#f5f5f5] selection:bg-[#a881fe] selection:text-[#0b0b0b] relative">
+      {/* 1. TOP NAVBAR (Refero Ultra-Glass) */}
+      <header className="sticky top-0 z-50 refero-glass-nav">
+        <div className="max-w-[1240px] mx-auto px-6 h-18 flex items-center justify-between">
           <div className="flex items-center gap-3.5">
-            <div className="relative w-12 h-12 sm:w-13 sm:h-13 rounded-xl overflow-hidden border border-[#a881fe]/40 bg-[#141414] shadow-[0_0_16px_rgba(168,129,254,0.25)] flex items-center justify-center p-1 group transition-all duration-300 hover:border-[#a881fe] hover:shadow-[0_0_24px_rgba(168,129,254,0.5)]">
+            <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl overflow-hidden border border-[#a881fe]/40 bg-[#121218]/80 shadow-[0_0_18px_rgba(168,129,254,0.3)] flex items-center justify-center p-1 group transition-all duration-300 hover:border-[#a881fe] hover:shadow-[0_0_24px_rgba(168,129,254,0.6)]">
               <Image
                 src="/images/pyhgoshift_symbol.png"
                 alt="PYHGOSHIFT Logo"
-                width={52}
-                height={52}
+                width={48}
+                height={48}
                 className="object-contain w-full h-full group-hover:scale-110 transition-transform duration-300"
                 priority
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold tracking-tight text-lg text-white font-sans">
+              <span className="font-bold tracking-tight text-lg text-white font-sans flex items-center gap-1.5">
                 PYHGOSHIFT
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#a881fe]/20 text-[#ccb2ff] border border-[#a881fe]/40">v2.0</span>
               </span>
-              <span className="text-[10px] text-[#a881fe] font-mono tracking-widest -mt-1 uppercase">
-                AgentOps Platform
+              <span className="text-[10px] text-[#ccb2ff] font-mono tracking-widest -mt-0.5 uppercase">
+                Digital Workforce Hub
               </span>
             </div>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8 text-sm font-medium text-[#aeaeae]">
-            <a href="#philosophy" className="hover:text-white transition-colors">철학과 이념</a>
-            <a href="#council" className="hover:text-white transition-colors">더 세븐 박 (7 Parks)</a>
-            <a href="#divisions" className="hover:text-white transition-colors">5대 사업부 (P-Y-H-G-O)</a>
-            <a href="#architecture" className="hover:text-white transition-colors">기술 아키텍처</a>
-            <a href="#contact" className="hover:text-white transition-colors">문의 및 상담</a>
+          {/* Desktop Navigation - 5대 명확한 메뉴 구조 */}
+          <nav className="hidden md:flex items-center space-x-7 text-sm font-medium text-[#c0c0c0]">
+            <a href="#philosophy" className="hover:text-white transition-colors flex items-center gap-1">
+              <span>철학과 이념</span>
+            </a>
+            <a href="#council" className="hover:text-white transition-colors flex items-center gap-1">
+              <span>더 세븐 박 (7 Parks)</span>
+            </a>
+            <a href="#divisions" className="hover:text-white transition-colors flex items-center gap-1">
+              <span>5대 사업부 (P-Y-H-G-O)</span>
+            </a>
+            <a href="#architecture" className="hover:text-white transition-colors flex items-center gap-1">
+              <span>AgentOps 인프라</span>
+            </a>
+            <a href="#contact" className="hover:text-white transition-colors flex items-center gap-1">
+              <span>도입 문의</span>
+            </a>
           </nav>
 
           <div className="hidden lg:flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#141414] border border-[#2e2e2e] text-xs text-[#aeaeae] font-mono">
+            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#181822]/80 border border-white/10 text-xs text-[#aeaeae] font-mono shadow-inner">
               <span className="w-1.5 h-1.5 rounded-full bg-[#a881fe] animate-pulse"></span>
               <span>192.168.64.31:3001</span>
             </div>
             <a
               href="#contact"
-              className="uizard-cta-primary px-4 py-2 text-xs uppercase tracking-wider"
+              className="uizard-cta-primary px-4 py-2 text-xs uppercase tracking-wider font-semibold shadow-md"
             >
               도입 상담하기
             </a>
@@ -122,7 +133,7 @@ export default function HomePage() {
           <div className="flex md:hidden">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-[#aeaeae] hover:text-white p-2"
+              className="text-[#aeaeae] hover:text-white p-2 rounded-lg bg-white/5 border border-white/10"
             >
               <Terminal className="w-5 h-5" />
             </button>
@@ -131,12 +142,12 @@ export default function HomePage() {
 
         {/* Mobile dropdown */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-b border-[#2e2e2e] bg-[#0b0b0b]/98 px-6 pt-3 pb-6 space-y-3 text-sm text-[#aeaeae]">
-            <a href="#philosophy" onClick={() => setMobileMenuOpen(false)} className="block hover:text-white">철학과 이념</a>
-            <a href="#council" onClick={() => setMobileMenuOpen(false)} className="block hover:text-white">더 세븐 박 (7 Parks)</a>
-            <a href="#divisions" onClick={() => setMobileMenuOpen(false)} className="block hover:text-white">5대 사업부 (P-Y-H-G-O)</a>
-            <a href="#architecture" onClick={() => setMobileMenuOpen(false)} className="block hover:text-white">기술 아키텍처</a>
-            <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="block hover:text-white">문의 및 상담</a>
+          <div className="md:hidden border-b border-white/10 bg-[#0c0c12]/98 backdrop-blur-2xl px-6 pt-3 pb-6 space-y-3 text-sm text-[#aeaeae]">
+            <a href="#philosophy" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-white">1. 철학과 이념 (자아 훼방)</a>
+            <a href="#council" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-white">2. 더 세븐 박 (7 Parks 집단지성)</a>
+            <a href="#divisions" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-white">3. 5대 전략 사업부 (P-Y-H-G-O)</a>
+            <a href="#architecture" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-white">4. AgentOps 기술 인프라</a>
+            <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-[#a881fe] font-semibold">5. 에이전트 도입 상담 →</a>
           </div>
         )}
       </header>
