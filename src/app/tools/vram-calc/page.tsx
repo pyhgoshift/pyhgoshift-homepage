@@ -10,7 +10,7 @@ export default function VramCalcPage() {
   return (
     <div className="w-full min-h-screen bg-[#0a0a0f]">
       <iframe
-        src="/vram-calc.html"
+        src="/vram-calc.html?v=20261014_2"
         className="w-full min-h-screen border-none block"
         style={{ width: '100%', height: '100vh', border: 'none' }}
         title="AI-LLMCheck VRAM Calculator"
