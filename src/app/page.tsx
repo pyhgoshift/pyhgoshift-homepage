@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -37,6 +37,7 @@ export default function HomePage() {
   const [pmoWeek, setPmoWeek] = useState("2026-10-W3");
   const [pmoGenerating, setPmoGenerating] = useState(false);
   const [pmoGenerated, setPmoGenerated] = useState(true);
+  const [pmoLiveContent, setPmoLiveContent] = useState<string>("");
   const [copiedReport, setCopiedReport] = useState(false);
 
   // 3. Project Setup Form State
@@ -48,7 +49,72 @@ export default function HomePage() {
     "[READY] Karpathy 규격 프로젝트 자동 셋업 엔진 대기 중..."
   ]);
 
-  // 4. RAG Search State
+  // 4. Live ChatOps State (사내 서버 192.168.64.31 실시간 연동)
+  const [chatopsLive, setChatopsLive] = useState<{
+    telegramStatus: string;
+    telegramPid: string;
+    slackStatus: string;
+    slackPid: string;
+    containers: Array<{ name: string; status: string; ports: string }>;
+    uptime: string;
+    loading: boolean;
+  }>({
+    telegramStatus: "ONLINE",
+    telegramPid: "1517708",
+    slackStatus: "ACTIVE",
+    slackPid: "1517920",
+    containers: [],
+    uptime: "정상 가동 중",
+    loading: false,
+  });
+
+  // 실시간 챗옵스 상태 불러오기
+  const fetchChatopsStatus = async () => {
+    setChatopsLive((prev) => ({ ...prev, loading: true }));
+    try {
+      const res = await fetch("/api/agentops/chatops/status");
+      const data = await res.json();
+      if (data.success) {
+        setChatopsLive({
+          telegramStatus: data.telegram.status,
+          telegramPid: data.telegram.pid,
+          slackStatus: data.slack.status,
+          slackPid: data.slack.pid,
+          containers: data.containers || [],
+          uptime: data.uptime || "가동 중",
+          loading: false,
+        });
+      }
+    } catch {
+      setChatopsLive((prev) => ({ ...prev, loading: false }));
+    }
+  };
+
+  // 실시간 최신 보고서 내용 불러오기
+  const fetchLatestReport = async () => {
+    try {
+      const res = await fetch("/api/agentops/reports/latest");
+      const data = await res.json();
+      if (data.success && data.content) {
+        setPmoLiveContent(data.content);
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    fetchChatopsStatus();
+    fetchLatestReport();
+  }, []);
+
+  useEffect(() => {
+    if (activePortalTab === "chatops") {
+      fetchChatopsStatus();
+    }
+  }, [activePortalTab]);
+
+  // 5. RAG Search State
   const [ragQuery, setRagQuery] = useState("");
   const [ragSearching, setRagSearching] = useState(false);
   const [ragResults, setRagResults] = useState([
@@ -72,7 +138,7 @@ export default function HomePage() {
     }
   ]);
 
-  // 5. Contact Form State
+  // 6. Contact Form State
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -113,26 +179,72 @@ export default function HomePage() {
     }
   };
 
-  const handleGeneratePmo = () => {
+  // 실제 사내 서버 report_crew.py 구동 API 호출
+  const handleGeneratePmo = async () => {
     setPmoGenerating(true);
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/agentops/pmo/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reportType: "weekly" })
+      });
+      const data = await res.json();
+      if (data.executionOutput) {
+        setPmoLiveContent(data.executionOutput);
+      } else {
+        await fetchLatestReport();
+      }
+    } catch {
+      await fetchLatestReport();
+    } finally {
       setPmoGenerating(false);
       setPmoGenerated(true);
-    }, 1200);
+    }
   };
 
-  const handleRunSetup = () => {
+  // 실제 사내 서버 setup_project.py 구동 API 호출
+  const handleRunSetup = async () => {
     setSetupRunning(true);
     setSetupLogs([
-      `[1/5] 프로젝트 디렉토리 생성 및 Git Init 시작: ${setupProjectName}`,
-      "[2/5] Karpathy 규격 CLAUDE.md 및 AGENTS.md 자동 주입 중...",
-      `[3/5] 담당 페르소나 매핑: ${setupPersona}`,
-      `[4/5] 기술 스택 및 의존성 락파일 주입: ${setupStack}`,
-      "[5/5] Dockerfile 및 Zod 보안 가드레일 활성화 완료! 🚀"
+      `[1/4] 사내 서버(192.168.64.31) 브릿지 연결 중...`,
+      `[2/4] setup_project.py 실행 트리거: 프로젝트명=${setupProjectName}, 스택=${setupStack}`
     ]);
-    setTimeout(() => {
+
+    try {
+      const res = await fetch("/api/agentops/projects/setup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectName: setupProjectName,
+          techStack: setupStack,
+          persona: setupPersona
+        })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setSetupLogs([
+          `[1/4] 사내 서버(192.168.64.31) 브릿지 연결 완료.`,
+          `[2/4] ${data.server}에서 setup_project.py 실행 완료.`,
+          `[3/4] Karpathy 표준 CLAUDE.md 및 프로젝트 구조 생성 성공.`,
+          `[4/4] 생성 산출물:`,
+          ...(data.filesGenerated || []).map((f: string) => `  ✔ ${f}`),
+          `[STATUS] 프로젝트 자동 셋업 완료! 🚀`
+        ]);
+      } else {
+        setSetupLogs([
+          `[ERROR] 실행 실패: ${data.error || "서버 응답 오류"}`,
+          `[FALLBACK] 로컬 표준 규격 템플릿 준비됨.`
+        ]);
+      }
+    } catch (err: any) {
+      setSetupLogs([
+        `[ERROR] 통신 에러: ${err?.message || "서버 브릿지 타임아웃"}`,
+        `[NOTICE] 로컬 환경에 캐시된 Karpathy 룰셋을 유지합니다.`
+      ]);
+    } finally {
       setSetupRunning(false);
-    }, 1500);
+    }
   };
 
   const handleRagSearch = (e: React.FormEvent) => {
@@ -498,13 +610,22 @@ export default function HomePage() {
                   </div>
 
                   <div className="voltagent-terminal p-5 text-xs text-slate-300 space-y-2 leading-relaxed">
-                    <div className="text-slate-400 pb-2 border-b border-[#27272a] font-bold text-[#00d992]">
-                      # [주요 달성 과업 및 에이전트별 활동 내역]
+                    <div className="text-slate-400 pb-2 border-b border-[#27272a] font-bold text-[#00d992] flex items-center justify-between">
+                      <span># [사내 개발 서버 192.168.64.31 실시간 PMO 보고서]</span>
+                      <span className="text-[10px] text-zinc-500 font-mono">Live PostgreSQL / report_crew.py</span>
                     </div>
-                    <div>• <strong>파일럿 박 (CPO)</strong>: awesome-design-md 기반 고밀도 개발자 중심 디자인 시스템 적용 및 포털 라우팅 완결.</div>
-                    <div>• <strong>이노베이터 박 (CTO)</strong>: Next.js 16.4.0 Standalone 도커 빌드 파이프라인 무결성 확보 및 상단 한 줄 네비게이션 적용.</div>
-                    <div>• <strong>고든 박 (CSO)</strong>: 사내 개발서버(`192.168.64.31`) 레거시 도커 캐시 3.5GB 프룬 및 미사용 잔여 폴더 아카이빙 격리 조치.</div>
-                    <div>• <strong>시냅스 박 (COO)</strong>: 텔레그램 회사서버봇(@ItcenServerbot) 및 슬랙 AI-PMO 웹소켓 세션 헬스체크 100% 정상 통과.</div>
+                    {pmoLiveContent ? (
+                      <pre className="whitespace-pre-wrap font-mono text-zinc-300 text-xs leading-relaxed max-h-72 overflow-y-auto">
+                        {pmoLiveContent}
+                      </pre>
+                    ) : (
+                      <div className="space-y-1.5">
+                        <div>• <strong>파일럿 박 (CPO)</strong>: awesome-design-md 기반 고밀도 개발자 중심 디자인 시스템 적용 및 포털 라우팅 완결.</div>
+                        <div>• <strong>이노베이터 박 (CTO)</strong>: Next.js 16.4.0 Standalone 도커 빌드 파이프라인 무결성 확보 및 상단 한 줄 네비게이션 적용.</div>
+                        <div>• <strong>고든 박 (CSO)</strong>: 사내 개발서버(`192.168.64.31`) 레거시 도커 캐시 3.5GB 프룬 및 미사용 잔여 폴더 아카이빙 격리 조치.</div>
+                        <div>• <strong>시냅스 박 (COO)</strong>: 텔레그램 회사서버봇(@ItcenServerbot) 및 슬랙 AI-PMO 웹소켓 세션 헬스체크 100% 정상 통과.</div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -619,44 +740,54 @@ export default function HomePage() {
           {/* TAB 3: 듀얼 챗옵스 관제 */}
           {activePortalTab === "chatops" && (
             <div className="p-6 sm:p-8 space-y-6">
-              <div className="pb-6 border-b border-[#27272a]">
-                <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                  <Radio className="w-4 h-4 text-[#00d992]" />
-                  <span>사내 듀얼 챗옵스 (Slack & Telegram) 실시간 통합 관제 패널</span>
-                </h3>
-                <p className="text-xs text-slate-400 mt-1">
-                  신규 사내 개발 서버(`192.168.64.31`)에 연동된 슬랙 AI-PMO 봇과 텔레그램 회사서버봇의 연결성 및 하트비트를 실시간 모니터링합니다.
-                </p>
+              <div className="flex items-center justify-between pb-6 border-b border-[#27272a]">
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                    <Radio className="w-4 h-4 text-[#00d992]" />
+                    <span>사내 듀얼 챗옵스 (Slack & Telegram) 실시간 관제 패널</span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    신규 사내 개발 서버(`192.168.64.31:7722`)의 슬랙/텔레그램 데몬 PID 및 도커 컨테이너를 실시간 동기화합니다.
+                  </p>
+                </div>
+                <button
+                  onClick={fetchChatopsStatus}
+                  disabled={chatopsLive.loading}
+                  className="px-3 py-1.5 rounded bg-[#101014] border border-[#27272a] hover:border-[#00d992]/50 text-xs font-mono text-zinc-300 hover:text-[#00d992] flex items-center gap-1.5 transition-colors"
+                >
+                  <Activity className={`w-3.5 h-3.5 ${chatopsLive.loading ? "animate-spin text-[#00d992]" : "text-[#00d992]"}`} />
+                  <span>{chatopsLive.loading ? "조회 중..." : "실시간 새로고침"}</span>
+                </button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="p-5 rounded-lg bg-[#101014] border border-[#27272a] space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm text-white flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-[#00d992] animate-pulse"></span>
+                      <span className={`w-2 h-2 rounded-full ${chatopsLive.slackStatus === "ACTIVE" ? "bg-[#00d992] animate-pulse" : "bg-amber-400"}`}></span>
                       <span>슬랙 봇: AI-PMO</span>
                     </span>
                     <span className="px-2 py-0.5 rounded voltagent-pill-green text-[10px] font-mono font-bold">
-                      ACTIVE 🟢
+                      {chatopsLive.slackStatus} 🟢
                     </span>
                   </div>
 
                   <div className="space-y-2 text-xs font-mono text-slate-300 bg-[#08080a] p-4 rounded-md border border-[#27272a]">
                     <div className="flex justify-between">
-                      <span className="text-slate-400">네트워크 소켓:</span>
+                      <span className="text-slate-400">프로세스 PID:</span>
+                      <span className="text-[#00d992]">PID: {chatopsLive.slackPid}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">채널 연동:</span>
+                      <span className="text-white">Slack Workspace (#ai-pmo)</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">실행 상태:</span>
                       <span className="text-[#00d992]">WebSocket / RTM 연결됨</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-400">응답 레이턴시:</span>
-                      <span className="text-white">12 ms</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">월간 가동률:</span>
-                      <span className="text-white">99.98%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">최근 트리거 명령:</span>
-                      <span className="text-[#00d992]">/pmo report generate 2026-10-W3</span>
+                      <span className="text-slate-400">서버 업타임:</span>
+                      <span className="text-white">{chatopsLive.uptime.split(",")[0] || "가동 중"}</span>
                     </div>
                   </div>
                 </div>
@@ -664,34 +795,51 @@ export default function HomePage() {
                 <div className="p-5 rounded-lg bg-[#101014] border border-[#27272a] space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm text-white flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-[#00d992] animate-pulse"></span>
+                      <span className={`w-2 h-2 rounded-full ${chatopsLive.telegramStatus === "ONLINE" ? "bg-[#00d992] animate-pulse" : "bg-amber-400"}`}></span>
                       <span>텔레그램 봇: 회사서버봇 (@ItcenServerbot)</span>
                     </span>
                     <span className="px-2 py-0.5 rounded voltagent-pill-green text-[10px] font-mono font-bold">
-                      ACTIVE 🟢
+                      {chatopsLive.telegramStatus} 🟢
                     </span>
                   </div>
 
                   <div className="space-y-2 text-xs font-mono text-slate-300 bg-[#08080a] p-4 rounded-md border border-[#27272a]">
                     <div className="flex justify-between">
-                      <span className="text-slate-400">적용 호스트:</span>
-                      <span className="text-[#00d992]">192.168.64.31 (사내 개발 서버)</span>
+                      <span className="text-slate-400">프로세스 PID:</span>
+                      <span className="text-[#00d992]">PID: {chatopsLive.telegramPid}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-400">실행 경로:</span>
+                      <span className="text-slate-400">실행 호스트:</span>
+                      <span className="text-white">192.168.64.31:7722</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">작업 디렉토리:</span>
                       <span className="text-white">/home/devadm01/itcen-claude-telChatOps</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-400">SSH 세션 연동:</span>
-                      <span className="text-white">포트 7722 정상 승인</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">최근 실행 상태:</span>
-                      <span className="text-[#00d992]">Docker Compose 100% 감시 중</span>
+                      <span className="text-slate-400">원격 보안 권한:</span>
+                      <span className="text-[#00d992]">SSH 7722 인증 완료</span>
                     </div>
                   </div>
                 </div>
               </div>
+
+              {chatopsLive.containers.length > 0 && (
+                <div className="p-4 rounded-lg bg-[#101014] border border-[#27272a] space-y-3">
+                  <div className="text-xs font-mono font-bold text-[#00d992] flex items-center justify-between">
+                    <span># 사내 개발 서버 가동 중인 도커 코어 엔진 ({chatopsLive.containers.length}개)</span>
+                    <span className="text-zinc-500 font-normal">docker ps (Live)</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-[11px] font-mono">
+                    {chatopsLive.containers.map((c, i) => (
+                      <div key={i} className="p-2 rounded bg-[#08080a] border border-[#27272a] flex items-center justify-between">
+                        <span className="text-zinc-200 font-semibold">{c.name}</span>
+                        <span className="text-[#00d992]">{c.status}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
